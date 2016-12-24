@@ -40,10 +40,11 @@ class datasource(object):
     def analyze(self):
         #initializing a few things
         dictlist = []
-        
+        num_lines = 0
         #read the expeiment file and parse it into a list of dicts
         with open(self.experiment_file) as inp:
             for line in inp:
+                num_lines+=1
                 name,typ,time,dic = line.split('@')
                 dic = literal_eval(dic)
                 if len(dic) == 0:
