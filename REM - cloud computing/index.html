@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html ng-app="store">
+ <head>
+ 	<script src="dist/libs/jquery-3.1.1.min.js"></script>
+ 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+ 	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript" src="js/app.js"></script>
+	<link rel="stylesheet" href="dist/themes/default-dark/style.min.css" />
+	<link rel="stylesheet" href="css/app.css" />
+	<script src="dist/jstree.min.js"></script>
+ </head>
+
+ <body>
+ <div class="header">
+ 	<div class="container">
+ 		<!-- <img ng-src="graph.png"> -->
+ 		<h1>Graph generation interface</h1>
+ 	</div>
+ </div>
+	<div class="container main">
+		<div class="row">
+			<p>Select a project:</p>
+			<div id="proj-selection" class="section">
+				<div id="jstree"></div>
+				<button id="proj-btn" class="btn">Accept</button>
+			</div>
+			<div class="section">
+				<form action="">
+					<input type="radio" name="work-type" value="create"> Create<br>
+					<input type="radio" name="work-type" value="load"> Load<br>
+
+					<div id="create-selection" class="section desc">
+					<p>Select graph parameters:</p>
+					<label>X-axis</label>
+						<input type="text" list="x-axis" />
+						<datalist name="x-axis" id="x-axis">
+						</datalist>
+					<label>Y-axis</label>
+						<input type="text" list="y-axis" />
+						<datalist name="y-axis" id="y-axis">
+						</datalist>
+					</div>
+					<div id="load-selection" class="section desc">
+					<p>Select a pre-defined graph:</p>
+					</div>
+				</form>
+			</div>
+
+			<div id="graph-display" class="section">
+				<iframe id="generate-graph" src=""></iframe>
+			</div>
+			
+		</div>
+	</div>
+ </body>
+</html>

@@ -1,0 +1,5 @@
+- add text filtering of columns
+- filter out columns of strings
+- running_time => time
+- if x value repeats, turn y values into "error bars"
+- change layout to maximize screen use
