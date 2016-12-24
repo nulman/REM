@@ -10,7 +10,8 @@
 }
 
 body{
-	background-image: url("../img/background2.jpg");
+	//background-image: url("../img/background2.jpg");
+	background-color: gray;
 	background-size: fill; 
 	overflow-y: hidden;
 }

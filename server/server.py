@@ -28,7 +28,7 @@ data = ''
 from DirectoryListing import getSubtree
 
 @app.route('/',methods=['GET', 'POST'])
-def spew():
+def main_page():
     #x = [1,2,3,'steve',{'a':34, 'b':17},4]
     if request.method == 'POST':
         print request.form
@@ -48,11 +48,14 @@ def listdir():
         print request.query_string
         print "-D- id: {}".format(request.args.get('id'))'''
         requested_path = request.args.get('id')
+        if requested_path == None:
+            requested_path = ''
         print "-D- requested_path: {}".format(requested_path)
         requested_path = requested_path.replace('#','')
         #if requested_path and requested_path != '#' : requested_path = BeautifulStoneSoup(requested_path, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).encode("UTF-8")
         #print "-D- id: {}".format(requested_path)
         res = getSubtree(requested_path)
+        #print res
         #print res
     return Response(res, mimetype='application/json')
     #return Response('[{"text":"root","children":[{"text":"DefaultJSONStructures","children":true,"id":"DefaultJSONStructures","icon":"folder"},{"text":"University01","children":true,"id":"University01","icon":"folder"},{"text":"University02","children":true,"id":"University02","icon":"folder"},{"text":"University03","children":true,"id":"University03","icon":"folder"}],"id":"\/","icon":"folder","state":{"opened":true,"disabled":true}}]', mimetype='application/json')
@@ -60,6 +63,7 @@ def listdir():
 
 @app.route('/getcolumns',methods=['GET'])
 def listcols():
+    print '-D- in get cols'
     #x = [1,2,3,'steve',{'a':34, 'b':17},4]
     res = ''
     global data
@@ -74,8 +78,9 @@ def listcols():
         requested_path = requested_path.replace('#','')
         #if requested_path and requested_path != '#' : requested_path = BeautifulStoneSoup(requested_path, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).encode("UTF-8")
         print "-D- experiment: {}".format(requested_path)
-        data = datasource(os.path.join(root_dir,requested_path))
-        data.analyze()
+        data = datasource(requested_path)
+        #data.analyze()
+        data.getcol()
         res = {'cols':data.columns, 'machines':data.machines}
     return Response(dumps(res), mimetype='application/json')
 
