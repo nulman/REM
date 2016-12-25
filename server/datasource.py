@@ -150,7 +150,7 @@ class datasource(object):
             for params in parameters:
             #take only rows that contain these columns
                 
-                frame_slice = pd.read_sql_query("select `{x}`,`{y}`,`name` from data where `{x}` != '' and `{y}` != '' and `name` = '{machine}' order by `{x}` asc".format(**params), conn)
+                frame_slice = pd.DataFrame(pd.read_sql_query("select `{x}`,`{y}`,`name` from data where `{x}` != '' and `{y}` != '' and `name` = '{machine}' order by `{x}` asc".format(**params), conn))
                 #print frame_slice 
                 #return
                 #frame_slice = frame[frame[params['y']] > 0.0]

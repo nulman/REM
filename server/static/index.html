@@ -2,28 +2,33 @@
 <html ng-app="store">
  <head>
  	<script src="dist/libs/jquery-3.1.1.min.js"></script>
+ 	<script src="js/jquery-ui.min.js"></script>
+ 	<script src="dist/jstree.min.js"></script>
+ 	<script type="text/javascript" src="js/file-explorer.js"></script>
+ 	<script type="text/javascript" src="js/app.js"></script>
+	<!-- <script type="text/javascript" src="js/bokeh-0.12.2.min.js"></script> -->
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+	<!-- <script type="text/javascript" src="css/bokeh-0.12.2.min.css"></script> -->
  	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
- 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="js/file-explorer.js"></script>
-	<script type="text/javascript" src="js/app.js"></script>
-	<script type="text/javascript" src="js/bokeh-0.12.2.min.js"></script>
 	<link rel="stylesheet" href="dist/themes/default-dark/style.min.css" />
 	<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.2.min.js"></script>
 	<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.2.min.css" type="text/css" />
 	<link rel="stylesheet" href="css/app.css" />
-	<script src="dist/jstree.min.js"></script>
+	
+	
  </head>
 
  <body>
  <!-- header -->
  <div class="header">
- 		<img id='logo' src="img/logo.png">
+ 		<img id='logo' src="img/logo2.png">
  		<h1>Graph generation interface</h1>
  </div>
 	<div class="container-fluid main">
 		<div class="row">
 			<!-- file explorer -->
-			<div class="col-md-3">
+			<div id="explorer-wrapper" class="col-md-3">
 				<div id="file-explorer" class="section">
 					<button id="up-dir" class='btn'>
 							<i class="glyphicon glyphicon-arrow-up white"></i>
@@ -33,7 +38,10 @@
 				</div>
 			</div>
 			<!-- right panel -->
-			<div class="col-md-8 right-panel">
+			<div class="right-panel col-md-8">
+				<button id="toggle-explorer" class="btn">
+					<i class="glyphicon glyphicon-arrow-left white"></i>
+				</button>
 				<!-- tab header -->
 				<ul class="nav nav-pills color">
 					<li><a data-toggle="pill" href="#parameter-selection">Parameter Selection</a></li>

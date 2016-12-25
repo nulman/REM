@@ -5,6 +5,7 @@ $(document).ready(function() {
 
   //handles parameter selection
   $('#param-select').on('click', function () {
+    $("#loader").show();
     //get the path of the project
     var x = $('#input-x').val();
     var y = $('#input-y').val();
@@ -38,6 +39,7 @@ function displayGraph(data){
   $.getScript(js); 
 
   $('.nav-pills a[href="#graph-display"]').tab('show');
+  $("#loader").hide();
 }
 
 function serverErrorHandler(data){
@@ -86,7 +88,7 @@ function fillProjectParameters(data){
 
 //fixes the height 
 function fixHeight(){
-  remaining_height = parseInt($(window).height() - 200); 
+  remaining_height = parseInt($(window).height() - 250); 
   $('#graph-display').height(remaining_height); 
 }
 

@@ -57,6 +57,17 @@ $(document).ready(function() {
       });
     }
   });
+
+  var duration = 'slow';
+
+  //toggles file explorer
+  $( "#toggle-explorer" ).click(function() {
+    $("#explorer-wrapper").toggle( "slide");
+    // $('#toggle-explorer').empty();
+    // $('#toggle-explorer').append('<i class="glyphicon glyphicon-arrow-right white"></i>');
+  });
+
+
 });
 
 
