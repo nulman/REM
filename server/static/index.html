@@ -4,7 +4,7 @@
  	<script src="dist/libs/jquery-3.1.1.min.js"></script>
  	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
  	<script type="text/javascript" src="js/bootstrap.min.js"></script>
- 	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript" src="js/file-explorer.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript" src="js/bokeh-0.12.2.min.js"></script>
 	<link rel="stylesheet" href="dist/themes/default-dark/style.min.css" />
@@ -16,28 +16,29 @@
 
  <body>
  <div class="header">
- 	<div class="container-fluid">
- 		<!-- <img ng-src="graph.png"> -->
+ 		<img id='logo' src="img/logo.png">
  		<h1>Graph generation interface</h1>
- 	</div>
  </div>
 	<div class="container-fluid main">
 		<div class="row">
-			<div class="col-md-12">
-				<ul class="nav nav-pills">
-					<li class="active"><a data-toggle="pill" href="#proj-selection">Project Selection</a></li>
+			<div class="col-md-3">
+				<div id="file-explorer" class="section">
+					<button id="up-dir" class='btn'>
+							<i class="glyphicon glyphicon-arrow-up white"></i>
+					</button>
+					<button id="proj-select" class="btn">OK</button>
+					<div id="jstree"></div>
+				</div>
+			</div>
+			<div class="col-md-8 right-panel">
+				<ul class="nav nav-pills color">
 					<li><a data-toggle="pill" href="#parameter-selection">Parameter Selection</a></li>
 					<li><a data-toggle="pill" href="#graph-display">Graph Display</a></li>
 				</ul>
-				<div id="err-msg" class="hidden">There seem to be an issue with the server. Please try again</div>
+				<div id="err-msg"></div>
+				<div id='loader' class="loader"></div>
 				<div class="tab-content">
-					<div id="proj-selection" class="section tab-pane fade in active">
-					<!-- <button id="load-tree">load tree</button> -->
-						<p>Select a project:</p>
-						<button id="up-dir">oneup</button>
-						<div id="jstree"></div>
-						<button id="proj-select" class="btn">Accept</button>
-					</div>
+					
 					<div id="parameter-selection" class="section tab-pane fade">
 						<form action="">
 							<!-- <input type="radio" name="work-type" value="create"> Create<br>
@@ -71,7 +72,7 @@
 										</datalist>
 									</div>
 								</div>
-								<button id="param-select" class="btn">Accept</button>
+								<button id="param-select" class="btn">OK</button>
 							</div>
 							<!-- <div id="load-selection" class="section desc">
 							<p>Select a pre-defined graph:</p>
