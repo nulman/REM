@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
   fixHeight();
+  $("#err-msg").hide();
 
   //handles parameter selection
   $('#param-select').on('click', function () {
@@ -41,13 +42,18 @@ function displayGraph(data){
 
 function serverErrorHandler(data){
   $('#err-msg').append(data);
-  $("#err-msg").removeClass("hidden");
+  $('#loader').hide();
+  $("#err-msg").show();
 }
 
 //receives a json list of parameters and puts them in the x/y/machines parameters list
 function fillProjectParameters(data){
   //hide error message (if present)
   $("#err-msg").hide();
+  //save types info
+  var x = $("#x-axis").val();
+  var y = $("#y-axis").val();
+  var machine = $("#machines").val();
   //delete previous options information
   $("#x-axis").empty();
   $("#y-axis").empty();
@@ -62,8 +68,19 @@ function fillProjectParameters(data){
     $("#machines").append($("<option>").text(value).attr("value",value));
   })
 
+  if(x != ""){
+    $("#x-axis").val(x);
+  }
+  if( y != ""){
+    $("#y-axis").val(y);
+  }
+  if( machine != ""){
+    $("#machines").val(machine);
+  }
+
   $('.nav-pills a[href="#parameter-selection"]').tab('show');
 
+  $("#param-select").removeClass('disabled');
   $('#loader').hide();
 }
 

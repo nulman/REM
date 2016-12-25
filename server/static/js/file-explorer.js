@@ -25,7 +25,8 @@ $(document).ready(function() {
    	currDir = url;
    	callUrlUpdate(url);
    }else{
-   	//do nothing - file is selected
+   	  //do nothing - file is selected
+
    }
   });
 
@@ -47,6 +48,7 @@ $(document).ready(function() {
       //get parameter list from the server, and fill parameters list
       url = "/getcolumns?experiment="+id;
       $('#loader').show();
+      $("#param-select").addClass('disabled');
 
       $.ajax({
         url: url,
@@ -95,17 +97,17 @@ function isValid(node){
 
 //updates the tree with new data
 function updateTree(data){
-  $('#jstree').jstree(true).settings.core.data = data;
+  $('#jstree').jstree(true).settings.core.data = data.json;
   $('#jstree').jstree(true).refresh();
 }
 
 //draws the initial tree
-function drawTree(json){
+function drawTree(data){
   $(function() {
       $('#jstree')
         .jstree({
           'core' : {
-            'data' : json,
+            'data' : data.json,
             'themes' : {
               "name": "default-dark",
               //"dots": true,
@@ -131,6 +133,8 @@ function drawTree(json){
           'plugins' : ['state','dnd','sort','types','contextmenu','unique']
         })
       });
+  //init currdir with directory of the first node
+  currDir = data.url;
 }
 
 //fixes the height 

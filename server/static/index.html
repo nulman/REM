@@ -15,12 +15,14 @@
  </head>
 
  <body>
+ <!-- header -->
  <div class="header">
  		<img id='logo' src="img/logo.png">
  		<h1>Graph generation interface</h1>
  </div>
 	<div class="container-fluid main">
 		<div class="row">
+			<!-- file explorer -->
 			<div class="col-md-3">
 				<div id="file-explorer" class="section">
 					<button id="up-dir" class='btn'>
@@ -30,22 +32,29 @@
 					<div id="jstree"></div>
 				</div>
 			</div>
+			<!-- right panel -->
 			<div class="col-md-8 right-panel">
+				<!-- tab header -->
 				<ul class="nav nav-pills color">
 					<li><a data-toggle="pill" href="#parameter-selection">Parameter Selection</a></li>
 					<li><a data-toggle="pill" href="#graph-display">Graph Display</a></li>
 				</ul>
-				<div id="err-msg"></div>
+
+
+				<!-- tab contents -->
+				<!-- hidden divs - errors and loaders -->
+				<div id="err-msg">Server error - is this an experiment file?</div>
 				<div id='loader' class="loader"></div>
+
+
 				<div class="tab-content">
-					
+					<!-- parameter selection tab -->
 					<div id="parameter-selection" class="section tab-pane fade">
 						<form action="">
-							<!-- <input type="radio" name="work-type" value="create"> Create<br>
-							<input type="radio" name="work-type" value="load"> Load<br> -->
-
 							<div id="create-selection" class="section desc">
 								<p>Select graph parameters:</p>
+
+								<!-- x axis -->
 								<div class="form-group row">
 									<label for="input-x" class="col-xs-2 col-form-label">X-axis</label>
 									<div class="col-xs-10">
@@ -55,6 +64,7 @@
 									</div>
 									<br>
 								</div>
+								<!-- y axis -->
 								<div class="form-group row">
 									<label for="input-y" class="col-xs-2 col-form-label">Y-axis</label>
 									<div class="col-xs-10">
@@ -64,6 +74,7 @@
 									</div>
 									<br>
 								</div>
+								<!-- machine name -->
 								<div class="form-group row">
 									<label for="input-machine" class="col-xs-2 col-form-label">Machines</label>
 									<div class="col-xs-10">
@@ -72,16 +83,17 @@
 										</datalist>
 									</div>
 								</div>
-								<button id="param-select" class="btn">OK</button>
+
+								<!-- ok button  -->
+								<button id="param-select" class="btn disabled">OK</button>
 							</div>
 							<!-- <div id="load-selection" class="section desc">
 							<p>Select a pre-defined graph:</p>
 							</div> -->
 						</form>
 					</div>
-
+					<!-- graph display tab -->
 					<div id="graph-display" class="section tab-pane fade">
-						<!-- <iframe id="generate-graph" src=""></iframe> -->
 					</div>
 				</div>
 			</div>

@@ -40,7 +40,11 @@ def getSubtree(current_path = ''):
             json_string.append(item)
         #print 'files:'
         for f in files:
-            if str(f).endswith('.db'):
+            try:
+                if str(f).endswith('.db'):
+                    continue
+            except UnicodeEncodeError as e:
+                print e
                 continue
             #print f
             item = {}
@@ -52,7 +56,7 @@ def getSubtree(current_path = ''):
             json_string.append(item)
         break #we only want one layer of listing
     #json_string = [json_string]
-    
+    json_string = {'json':json_string, 'url':root_dir}
     return dumps(json_string)
 
 if __name__ == '__main__':            
