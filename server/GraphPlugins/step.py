@@ -68,7 +68,7 @@ class step(object):
         with open (join('static', js_path), 'w') as out:
             out.write(js)
 #        if __name__ == '__main__':
-        charts.show(fig)
+        #charts.show(fig)
         return {'div':div, 'js':js_path}
         
 if __name__ == '__main__':

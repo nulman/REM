@@ -144,6 +144,7 @@ function handleParameters(data){
 //fill model list with all available models
 function fillModelList(data){
   var modelsList = Object.keys(data);
+  $('#models').empty();
 
   $.each(modelsList, function(i,value){
     var newOption = document.createElement("option");
