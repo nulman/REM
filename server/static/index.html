@@ -12,8 +12,9 @@
 	<!-- <script type="text/javascript" src="css/bokeh-0.12.2.min.css"></script> -->
  	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
 	<link rel="stylesheet" href="dist/themes/default-dark/style.min.css" />
-	<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.2.min.js"></script>
-	<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.2.min.css" type="text/css" />
+	<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.4.min.js"></script>
+	<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-compiler-0.12.4.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.4.min.css" type="text/css" />
 	<link rel="stylesheet" href="css/app.css" />
 	
 	
@@ -44,56 +45,46 @@
 				</button>
 				<!-- tab header -->
 				<ul class="nav nav-pills color">
-					<li><a data-toggle="pill" href="#parameter-selection">Parameter Selection</a></li>
+					<li><a data-toggle="pill" href="#graph-selection">Parameter Selection</a></li>
 					<li><a data-toggle="pill" href="#graph-display">Graph Display</a></li>
 				</ul>
 
 
 				<!-- tab contents -->
 				<!-- hidden divs - errors and loaders -->
-				<div id="err-msg">Server error - is this an experiment file?</div>
+				<div id="err-msg">Server error</div>
 				<div id='loader' class="loader"></div>
 
 
 				<div class="tab-content">
 					<!-- parameter selection tab -->
-					<div id="parameter-selection" class="section tab-pane fade">
-						<form action="">
-							<div id="create-selection" class="section desc">
-								<p>Select graph parameters:</p>
-
-								<!-- x axis -->
+					<div id="graph-selection" class="section tab-pane fade">
+						<form action="" id='models-form'>
+							<div id="model-selection" class="section desc">
+								<p>Select graph model:</p>
+								<!-- model selection -->
 								<div class="form-group row">
-									<label for="input-x" class="col-xs-2 col-form-label">X-axis</label>
+									<label for="models" class="col-xs-2 col-form-label">Model: </label>
 									<div class="col-xs-10">
-										<input class="form-control" type="text" list="x-axis" id="input-x"/>
-										<datalist name="x-axis" id="x-axis">
-										</datalist>
+										<!-- <input class="form-control" type="text" list="models" id="input-models"/> -->
+										<select name="models" id="models" class='form-control'>
+										</select>
 									</div>
 									<br>
 								</div>
-								<!-- y axis -->
-								<div class="form-group row">
-									<label for="input-y" class="col-xs-2 col-form-label">Y-axis</label>
-									<div class="col-xs-10">
-										<input class="form-control" type="text" list="y-axis" id="input-y"/>
-										<datalist name="y-axis" id="y-axis">
-										</datalist>
-									</div>
-									<br>
-								</div>
-								<!-- machine name -->
-								<div class="form-group row">
-									<label for="input-machine" class="col-xs-2 col-form-label">Machines</label>
-									<div class="col-xs-10">
-										<input class="form-control" type="text" list="machines" id="input-machine"/>
-										<datalist name="machines" id="machines">
-										</datalist>
-									</div>
-								</div>
+								<!-- ok button  -->
+								<!-- <button id="model-select" class="btn disabled">OK</button> -->
+							</div>
+							<!-- <div id="load-selection" class="section desc">
+							<p>Select a pre-defined graph:</p>
+							</div> -->
+						</form>
+						<hr>
+						<form action="" id='parameters-form'>
+							<div id="parameter-selection" class="section desc">
 
 								<!-- ok button  -->
-								<button id="param-select" class="btn disabled">OK</button>
+								<!-- <button id="param-select" class="btn disabled">OK</button> -->
 							</div>
 							<!-- <div id="load-selection" class="section desc">
 							<p>Select a pre-defined graph:</p>

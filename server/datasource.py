@@ -16,6 +16,7 @@ from bokeh.io import save
 from os.path import basename, join, dirname, isfile
 from os import stat, remove
 from json import dumps
+#import GraphPlugins
 
 class datasource(object):
     experiment_file = ''
@@ -36,20 +37,28 @@ class datasource(object):
             if isfile(self.sqlpath):
                 conn = sqlite3.connect(self.sqlpath)
                 archived_size = long(conn.execute('select size from attributes').fetchone()[0])
+                archived_timestamp = conn.execute('select timestamp from attributes').fetchone()[0]
                 conn.close()
                 current_size = stat(self.experiment_file).st_size
+                current_timestamp = stat(self.experiment_file).st_mtime
                 #print 'archived={} {} current={} {}'.format(archived_size,type(archived_size),current_size,type(current_size))
                 if archived_size < current_size: #exoerimetn fle grew since last time we scanned it
                     start_pos = archived_size + 1
                     print '-D- changed old file, seeking to {}'.format(start_pos)
                 elif archived_size > current_size: #experiment file shrunk, this should never happen
                     raise Exception('test file shrunk!')
+                elif archived_size == current_size and current_timestamp > archived_timestamp:
+                    print '-D- current_timestamp:{} archived_timestamp{}'.format(current_timestamp,archived_timestamp)
+                    raise Exception('test file timestamp changed!')
                 else: #nothing changed since lst scan
                     print '-D- old, unchanged file'
                     return
         except sqlite3.OperationalError as e:
             print e
             conn.close()
+            remove(self.sqlpath)
+        except Exception as e:
+            print e
             remove(self.sqlpath)
         self.analyze(start_pos)
                 
@@ -84,6 +93,7 @@ class datasource(object):
         #initializing a few things
         dictlist = []
         filesize = stat(self.experiment_file).st_size
+        timestamp = stat(self.experiment_file).st_mtime
         #read the expeiment file and parse it into a list of dicts
         with open(self.experiment_file) as inp:
             inp.seek(start_pos)
@@ -123,7 +133,7 @@ class datasource(object):
             pd.DataFrame(frame.columns).to_sql('columns',conn,if_exists='replace',index= False)
             pd.DataFrame(frame['name'].unique()).to_sql('machines',conn,if_exists='replace',index= False)
             frame.to_sql('data',conn,if_exists='append',index= False)
-            pd.DataFrame([{'size':filesize}]).to_sql('attributes',conn, if_exists='replace', index= False)
+            pd.DataFrame([{'size':filesize, 'timestamp':timestamp}]).to_sql('attributes',conn, if_exists='replace', index= False)
             conn.close()
         except Exception as e:
             print e
@@ -173,7 +183,8 @@ class datasource(object):
         js_path = join('bokeh','{}_js.js'.format(name))
         with open (join('static', js_path), 'w') as out:
             out.write(js)
-        #show(fig)
+        if __name__ == '__main__':
+            show(fig)
         return {'div':div, 'js':js_path}
 '''        
     #set parameters for the lines

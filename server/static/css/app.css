@@ -3,11 +3,15 @@
 	margin: 0;
 }
 
+.form-group.row{
+	margin: 5px;
+}
+
 body{
 	//background-image: url("../img/background2.jpg");
 	background-color: gray;
 	background-size: fill; 
-	overflow-y: hidden;
+	//overflow-y: hidden;
 }
 
 html,body{
@@ -21,7 +25,7 @@ html,body{
 	color:white;
 	padding-bottom: 100%;
     margin-bottom: -100%;
-    overflow-y: hidden;
+    //overflow-y: hidden;
     
 }
 
@@ -72,16 +76,13 @@ h1{
 	color: white;
 }
 
-select{
+select,datalist{
 	color:black;
+	width:100%;
 }
 
 .create-selection{
 	opacity: 1;
-	color: black;
-}
-
-datalist{
 	color: black;
 }
 
@@ -142,3 +143,8 @@ datalist{
 .disabled{
 	background-color: gray;
 }
+
+/*#parameters-form{
+	border: 1px solid gray;
+	border-radius: 5px;
+}*/

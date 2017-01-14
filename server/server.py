@@ -6,13 +6,14 @@ Created on Mon Nov 21 12:34:23 2016
 """
 
 import os
-import sqlite3
+#import sqlite3
 from sys import argv
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, current_app, Response
-from json import dumps
+from json import dumps, loads
 from os.path import abspath, dirname
 from datasource import datasource
+import GraphPlugins
 #from BeautifulSoup import BeautifulStoneSoup
 if(len(argv) > 1):
     os.chdir(argv[1])
@@ -81,22 +82,33 @@ def listcols():
         data = datasource(requested_path)
         #data.analyze()
         data.getcol()
-        res = {'cols':data.columns, 'machines':data.machines}
+        res = {'cols':data.columns, 'machines':data.machines, 'models':GraphPlugins.graphtypes}
     return Response(dumps(res), mimetype='application/json')
 
-@app.route('/plot',methods=['GET'])
+
+
+@app.route('/plot',methods=['POST'])
 def plot():
     global data
-    if type(data) == str: return ''
-    print "-D- {} {}".format(request.method, type(request.method))
-    print request.query_string
-    x = request.args.get('x').replace('#','')
-    y = request.args.get('y').replace('#','')
-    machines = request.args.get('machines').replace('#','')
-    print "-D- x:{} y:{} machines:{}".format(x,y,machines)
-    components = data.plot(x,y,machines)
-    print '-D- data.machines:{}'.format(data.machines)
-    print components
+    #if type(data) == str: return ''
+    #print "-D- {} {}".format(request.method, type(request.method))
+    #print request.data
+    parameters = request.get_json(force=True)
+    #print parameters
+    #type(parameters)
+    #parameters = loads(parameters)
+    graphtype = parameters.keys()[0]
+    #print request.query_string
+    #x = request.args.get('x').replace('#','')
+    #y = request.args.get('y').replace('#','')
+    #machines = request.args.get('machines').replace('#','')
+    #print "-D- x:{} y:{} machines:{}".format(x,y,machines)
+    #components = data.plot(x,y,machines)
+    graph = getattr(getattr(GraphPlugins,graphtype),graphtype)()
+    #graph = GraphPlugins.Line.Line()
+    components = graph.plot(data.filename, data.sqlpath, **parameters[graphtype])
+    #print '-D- data.machines:{}'.format(data.machines)
+    #print components
     return Response(dumps(components), mimetype='application/json')
 try:
     if __name__ == '__main__':

@@ -52,7 +52,7 @@ $(document).ready(function() {
 
       $.ajax({
         url: url,
-        success: fillProjectParameters,
+        success: handleParameters,
         error: serverErrorHandler
       });
     }
