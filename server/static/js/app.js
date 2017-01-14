@@ -150,6 +150,9 @@ function fillModelList(data){
     newOption.innerHTML = value;
     $('#models').append(newOption);
   });
+
+  selectedModel = $('#models').val();
+  generateGraphParameters(graphData, selectedModel);
 }
 
 //generates the required graph parameters
