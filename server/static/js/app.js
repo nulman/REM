@@ -134,10 +134,43 @@ function serverErrorHandler(data){
 function handleParameters(data){
   graphData = data;
 
-  fillModelList(data.models);
+  fillModelListImages(data.models);
   $('.nav-pills a[href="#graph-selection"]').tab('show');
   $('#model-select').removeClass('disabled');
   $('#loader').hide();
+}
+
+function fillModelListImages(data){
+  var modelsList = Object.keys(data);
+  $('#model-list').empty();
+
+  $.each(modelsList, function(i,value){
+    //generate li element with image and model name
+    var newImage = document.createElement("img");
+    //if image exists- use image,  otherwise use default image
+    newImage.setAttribute('src','img/pluginImg/'+value+'.png');
+    newImage.setAttribute('onerror',"this.onerror=null;this.src='img/defaultLogo.png';");
+    var newP = generateParagraph(value);
+
+    var newLi = document.createElement("li");
+    newLi.append(newImage);
+    newLi.append(newP);
+    newLi.setAttribute('name',value);
+
+    //append new li
+    $('#model-list').append(newLi);
+  });
+
+  //handling model selection (li click event)
+  $("#model-list li").on("click",function() {
+    //remove all other highlights
+    $("#model-list li").removeClass('highlight');
+    //add highlight to selected
+    $(this).addClass('highlight');
+    //generate the graph parameters
+    selectedModel = this.textContent;
+    generateGraphParameters(graphData, selectedModel);
+  });
 }
 
 
@@ -159,8 +192,7 @@ function fillModelList(data){
 //generates the required graph parameters
 function generateGraphParameters(data, model){
   $('#parameter-selection').empty();
-  var newP = document.createElement("p");
-  newP.innerHTML = "Select graph parameters:";
+  var newP = generateParagraph("Select graph parameters:");
   $('#parameter-selection').append(newP);
 
   //go over all the model parameters, generate an input field and fill in the input parameters
@@ -269,6 +301,13 @@ function generateButton(id,className,text){
   newButton.innerHTML = text;
 
   return newButton;
+}
+
+function generateParagraph(text){
+  var newP = document.createElement('p');
+  newP.innerHTML = text;
+
+  return newP;
 }
 
 //fixes the height of the graph display tab

@@ -14,7 +14,7 @@ from bokeh.io import save
 from bokeh import charts
 #Step, show, output_file, ColumnDataSource
 
-class step(object):
+class Step(object):
     def getparameters(self):
         #return {'Line': {'x-axis':'single', 'y-axis':'single', 'group-by':'multiple'}}
         params = OrderedDict()
