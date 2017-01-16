@@ -56,7 +56,7 @@ class Step(object):
         #fig = charts.Step(data=frame_slice, x=x_axis, y=y_axis)
         fig = charts.Step(data=frame_slice, x='timestamp', y='performance')
         #fig = Bokehstep(frame_slice, x=x_axis, y=y_axis, legend=True, tools=['hover','crosshair','wheel_zoom','box_zoom','pan','save','resize','reset'])
-        name = '{}_{}_{}'.format(filename,x_axis,y_axis)
+        name = '{}_{}_{}_{}'.format(filename,self.getparameters().keys()[0],x_axis,y_axis)
         name = name.replace(':','')
         charts.output_file('static\\'+name+'.html', title=name, mode='cdn', root_dir=None)
         save(fig)

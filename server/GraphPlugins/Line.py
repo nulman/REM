@@ -40,6 +40,7 @@ class Line(object):
             i+=1
         fig = plotting.figure(title=figure_name,sizing_mode='stretch_both', x_axis_label=x_axis ,y_axis_label=y_axis ,tools=['hover','crosshair','wheel_zoom','box_zoom','pan','save','resize','reset'])
         conn = sqlite3.connect(sqlpath)
+        dump = pd.DataFrame()
         try:
             for params in parameters:
             #take only rows that contain these columns
@@ -51,13 +52,17 @@ class Line(object):
                 #frame_slice = frame_slice[frame_slice[params['x']] > 0.0]
                 #frame_slice = frame_slice[frame_slice.name == params['machine']][[params['x'], params['y']]]
                 #print frame_slice
+                dump = dump.append(frame_slice)
                 fig.line(source=plotting.ColumnDataSource(frame_slice), x=params['x'],y=params['y'], line_width=2, legend=params['machine'], color=params['color'])
         except Exception as e:
             print e
             conn.close()
         conn.close()
-        name = '{}_{}_{}'.format(filename,x_axis,y_axis)
+        name = '{}_{}_{}_{}'.format(filename,self.getparameters().keys()[0],x_axis,y_axis)
         name = name.replace(':','')
+        dump = dump.reset_index(drop=True)
+        dump.to_json('static\\'+name+'.json')
+        del(dump)
         plotting.output_file('static\\'+name+'.html', title=name, mode='cdn', root_dir=None)
         save(fig)
         js,div =components(fig, wrap_script = False, wrap_plot_info = True)

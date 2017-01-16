@@ -8,7 +8,12 @@ __all__.remove('__init__')
 
 graphtypes = {}
 for item in __all__:
-    mod = __import__('{}'.format(item,item),locals(),globals())
+    try:
+        mod = __import__('{}'.format(item,item),locals(),globals())
+    except ImportError as e:
+        print e
+        print 'The module file must contain a class with the same name as the module.\nskipping module {}'.format(item)
+        continue
     #print type(mod)
     #print mod
     graphtypes.update(getattr(mod,item)().getparameters())

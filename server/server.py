@@ -1,36 +1,58 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 21 12:34:23 2016
-
 @author: anulman
+
+this script takes exactly one (optional) parameter the FULL path to the experiments folder
 """
 
 import os
-#import sqlite3
 from sys import argv
+#if(len(argv) > 1):
+#    print argv
+#    os.chdir(argv[1])
+#import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, current_app, Response
 from json import dumps, loads
 from os.path import abspath, dirname
-from datasource import datasource
-import GraphPlugins
+import socket
 #from BeautifulSoup import BeautifulStoneSoup
-if(len(argv) > 1):
-    os.chdir(argv[1])
-
 app = Flask(__name__)
 app.config.from_object(__name__)
-os.environ['experiment_root_dir'] = os.path.join(dirname(abspath(__file__)), 'experiments')
-root_dir = os.environ['experiment_root_dir']
-print os.environ['experiment_root_dir']
+
+#app.config.update(dict(
+#    SECRET_KEY='this is my secret key, there are many like it, but this one is mine',
+#    USERNAME='admin',
+#    PASSWORD='iddqd'
+#))
+#print '__file__ : {}'.format(__file__)
+#print 'dirname(abspath(__file__)) : {}'.format(dirname(abspath(__file__)))
+if(len(argv) > 1):
+    os.environ['experiment_root_dir'] = argv[1]
+    root_dir = os.environ['experiment_root_dir']
+else:
+    os.environ['experiment_root_dir'] = os.path.join(dirname(abspath(__file__)), 'experiments')
+    root_dir = os.environ['experiment_root_dir']
+#print os.environ['experiment_root_dir']
+
+from datasource import datasource
+from DirectoryListing import getSubtree
+import GraphPlugins
+
 data = ''
 #current_app.config[ ('root_dir', dirname(abspath(__file__)))
-   
-from DirectoryListing import getSubtree
+
+#@app.route('/test',methods=['GET', 'POST'])
+#def login():
+#    session['logged_in'] = True
+#    flash('You were logged in')
+#    return redirect(os.path.join('static', 'index.html'))
 
 @app.route('/',methods=['GET', 'POST'])
 def main_page():
-    #x = [1,2,3,'steve',{'a':34, 'b':17},4]
+    print session
+#    if not session.get('logged_in'):
+#        abort(401)
     if request.method == 'POST':
         print request.form
     else:
@@ -104,7 +126,7 @@ def plot():
     #machines = request.args.get('machines').replace('#','')
     #print "-D- x:{} y:{} machines:{}".format(x,y,machines)
     #components = data.plot(x,y,machines)
-    graph = getattr(getattr(GraphPlugins,graphtype),graphtype)()
+    graph = getattr(getattr(GraphPlugins,graphtype),graphtype)() #this will create an instance of the requested graph type
     #graph = GraphPlugins.Line.Line()
     components = graph.plot(data.filename, data.sqlpath, **parameters[graphtype])
     #print '-D- data.machines:{}'.format(data.machines)
@@ -112,8 +134,13 @@ def plot():
     return Response(dumps(components), mimetype='application/json')
 try:
     if __name__ == '__main__':
-        app.run(host= '0.0.0.0', threaded=True)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(('',0))
+        port = sock.getsockname()[1]
+        port = 5000 #while developing use a static port
+        print "-I- starting server on port {}".format(port)
+        sock.close()
+        app.run(host = '0.0.0.0', port = port, threaded=True)
 except KeyboardInterrupt:
     print 'alas poor yorrick..'
     exit
-    
