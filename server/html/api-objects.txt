@@ -1,0 +1,14 @@
+server	server-module.html
+server.reloadplugin	server-module.html#reloadplugin
+server.main_page	server-module.html#main_page
+server.last_reload	server-module.html#last_reload
+server.app	server-module.html#app
+server.loadpreset	server-module.html#loadpreset
+server.plot	server-module.html#plot
+server.__package__	server-module.html#__package__
+server.savepreset	server-module.html#savepreset
+server.module_reloader	server-module.html#module_reloader
+server.listdir	server-module.html#listdir
+server.deletepreset	server-module.html#deletepreset
+server.data	server-module.html#data
+server.listcols	server-module.html#listcols

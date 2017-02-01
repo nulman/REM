@@ -1,21 +1,105 @@
-var graphData = "";         //holds the received server response when user selects a project
-var selectedModel = "";     //holds the selected graph model
+///////////holds all the Graph Generation functions///////////////////////
 
+//global variables
+var graphData;         //holds the received server response when user selects a project
+var selectedModel;     //holds the selected graph model
+var presets;           //holds the presets received from the server
+
+//on document ready
 $(document).ready(function() {
-
-  $("#err-msg").hide();
+  //hide message
+  resetDisplay();
   fixHeight();
-
-  //handles model selection
-  // $('#model-select').on('click',function(){
-  //   selectedModel = $('#input-models').val();
-  //   generateGraphParameters(graphData, selectedModel); 
-  // });
-
+  
+  //add listerer to models selection - once a model is click, create the necessary input parameters
   $("#models").on('input', function () {
+    $("#err-msg").hide();
     selectedModel = $('#models').val();
     generateGraphParameters(graphData, selectedModel); 
   });
+
+  //add listener to plugin reload button- reload the plugins and refresh the model list
+  $('#reload-plugins').click(function(){
+    $("#err-msg").hide();
+    //reload plugins
+    $.ajax({
+      type: "GET",
+      url: "/reloadplugin"
+    });
+    //refresh models list
+    sendExperimentToServer();
+  });
+
+  //add listener to preset select button
+  $('#preset-list').change(function(){
+    $('#select-preset').removeClass('disabled');
+    $('#delete-preset').removeClass('disabled');
+  });
+
+  //add listener to preset select button
+  $('#select-preset').click(function(){
+    var selectedPreset = $('#preset-list').val();
+    sendParametersToServer(presets[selectedPreset]);
+  });
+
+  $('#param-select').click(fetchParametersAndGetGraph);
+
+  //save dialog functions
+  $('#save-preset').click(function(){
+    $('#save-as-wrapper').show();
+  });
+
+  $('#save-as-cancel').click(function(){
+    $('#preset-name').val('');
+    $('#save-as-wrapper').hide();
+  });
+
+  $('#save-as-ok').click(function(){
+    var presetName = $('#preset-name').val();
+    //get all other preset parameters and send to server
+    var presetParameters = fetchParameters();
+    var savedPreset = {'name':presetName, 'preset':presetParameters};
+    $.ajax({
+      type: "POST",
+      url: "/save",
+      success: displayOkMessage,
+      error: serverErrorHandler,
+      contentType:'application/json',
+      data: JSON.stringify(savedPreset),
+      dataType:'json'
+    });
+    getPresetList();
+    //clear input and hide save as dialog
+    $('#preset-name').val('');
+    $('#save-as-wrapper').hide();
+
+  });
+
+  $('#delete-preset').click(function(){
+    var selectedPreset = [$('#preset-list').val()];
+    $.ajax({
+      type: "POST",
+      url: "/delete",
+      success: displayOkMessage,
+      error: serverErrorHandler,
+      contentType:'application/json',
+      data: JSON.stringify(selectedPreset),
+      dataType:'json'
+    });
+    getPresetList();
+  });
+
+  $('#parameters-form').change(function(){
+    if(isParametersFormValid()){
+      $('#param-select').removeClass('disabled');
+      $('#save-preset').removeClass('disabled');
+    }else{
+      $('#param-select').addClass('disabled');
+      $('#save-preset').addClass('disabled');
+    }
+  });
+
+  $('#reload-preset').click(getPresetList);
 
   //prevent page reload on form send
   $("form").on("submit", function (e) {
@@ -23,66 +107,96 @@ $(document).ready(function() {
   });
 });
 
-//collects all the parameters selected by the user,
+//displays the ok message received from the server
+function displayOkMessage(message){
+  $('#server-success').html(message[0]);
+  $('#server-success').show();
+  $('#server-success').fadeOut(5000);
+}
+
+
+//gathers all the parameters from the parameters form and returns a json
+function fetchParameters(){
+  //get the parameters (deep copy)
+  var modelParamJson = $.extend( true, {}, graphData.models[selectedModel] );
+
+  //for each parameter,  fill the json with the actual value
+  $.each(graphData.models[selectedModel],function(key,value){
+    switch(value.type){
+      case 'single':
+        modelParamJson[key] = $('#input-'+key).val();
+        break;
+      case 'multiple':
+        //get all the selected values
+        var allSelectedValues = [];
+        $('#input-'+key+' :selected').each(function(i, selected){
+          allSelectedValues[i] = $(selected).text();
+        });
+        //put in json
+        modelParamJson[key] = allSelectedValues;
+        break;
+      case 'radio':
+        modelParamJson[key] = $('#input-'+key).val();
+        break;
+      case 'checkbox':
+        //get all the checked values
+        var allCheckedValues = [];
+        $('#input-'+key+' :selected').each(function(i, checked){
+          allCheckedValues[i] = $(checked).text();
+        });
+        break;
+      case 'range':
+        //add handling
+        break;
+    }
+  });
+
+  var json = {};
+  json[selectedModel] = modelParamJson;
+  return json;
+}
+
+
+//collects all the graph parameters selected by the user,
 //generates a json and sends to the server
 function fetchParametersAndGetGraph(){
   //show loader animation
   $("#loader").show();
+  console.log("sending selected parameters to the server");
 
-    //get the parameters
-    //var modelParamJson = graphData.models[selectedModel];
-    var modelParamJson = $.extend( true, {}, graphData.models[selectedModel] );
+  var modelParamJson = fetchParameters();
+  //compile parameter json
+  sendParametersToServer(modelParamJson);
+}
 
-    $.each(graphData.models[selectedModel],function(key,value){
-      switch(value.type){
-        case 'single':
-          modelParamJson[key] = $('#input-'+key).val();
-          break;
-        case 'multiple':
-          //get all the selected values
-          var allSelectedValues = [];
-          $('#input-'+key+' :selected').each(function(i, selected){
-            allSelectedValues[i] = $(selected).text();
-          });
-          //put in json
-          modelParamJson[key] = allSelectedValues;
-          break;
-      }
+//sends the given parameters to the server
+function sendParametersToServer(data){
+  //send to server to generate graph
+  $.ajax({
+      type: "POST",
+      url: "/plot",
+      success: displayGraph,
+      error: serverErrorHandler,
+      contentType:'application/json',
+      data: JSON.stringify(data),
+      dataType:'json'
     });
-    //compile parameter json
-    var json = {};
-    json[selectedModel] = modelParamJson;
-
-    //send to server to generate graph
-    $.ajax({
-        type: "POST",
-        url: "/plot",
-        success: displayGraph,
-        error: serverErrorHandler,
-        contentType:'application/json',
-        data: JSON.stringify(json),
-        dataType:'json'
-      });
 }
 
 //display the graph received from the server
 function displayGraph(data){
   //hide error message (if present)
-  $("#err-msg").addClass("hidden");
   $("#graph-display").empty();
 
   var div = data.div;
   var js = data.js;
-
-  console.log(div);
-  console.log(js);
 
   $("#graph-display").append(div);
   $.getScript(js); 
   //switch to graph display tab
   $('.nav-pills a[href="#graph-display"]').tab('show');
   //hide loader animation
-  $("#loader").hide();
+  resetDisplay();
 }
 
 //displays an error message
@@ -92,54 +206,19 @@ function serverErrorHandler(data){
   $("#err-msg").show();
 }
 
-// //receives a json list of parameters and puts them in the x/y/machines parameters list
-// function fillProjectParameters(data){
-//   //hide error message (if present)
-//   $("#err-msg").hide();
-//   //save types info
-//   var x = $("#x-axis").val();
-//   var y = $("#y-axis").val();
-//   var machine = $("#machines").val();
-//   //delete previous options information
-//   $("#x-axis").empty();
-//   $("#y-axis").empty();
-//   $("#machines").empty();
-
-//   //fill parameter options
-//   $.each(data.cols, function(i, value) {
-//     $('#x-axis').append($('<option>').text(value).attr('value', value));
-//     $('#y-axis').append($('<option>').text(value).attr('value', value));
-//   });
-//   $.each(data.machines, function(i,value){
-//     $("#machines").append($("<option>").text(value).attr("value",value));
-//   })
-
-//   if(x != ""){
-//     $("#x-axis").val(x);
-//   }
-//   if( y != ""){
-//     $("#y-axis").val(y);
-//   }
-//   if( machine != ""){
-//     $("#machines").val(machine);
-//   }
-
-//   $('.nav-pills a[href="#parameter-selection"]').tab('show');
-
-//   $("#param-select").removeClass('disabled');
-//   $('#loader').hide();
-// }
-
-//fills the model list
+//fills the model list and moves between tabs - called when server returns selected experiment info
 function handleParameters(data){
   graphData = data;
 
   fillModelListImages(data.models);
+  getPresetList();
   $('.nav-pills a[href="#graph-selection"]').tab('show');
+  $('.nav-pills a[href="#create-new"]').tab('show');
   $('#model-select').removeClass('disabled');
-  $('#loader').hide();
+  resetDisplay();
 }
 
+//fills the model list iwth available models and images
 function fillModelListImages(data){
   var modelsList = Object.keys(data);
   $('#model-list').empty();
@@ -173,21 +252,28 @@ function fillModelListImages(data){
   });
 }
 
-
-//fill model list with all available models
-function fillModelList(data){
-  var modelsList = Object.keys(data);
-  $('#models').empty();
-
-  $.each(modelsList, function(i,value){
-    var newOption = document.createElement("option");
-    newOption.innerHTML = value;
-    $('#models').append(newOption);
-  });
-
-  selectedModel = $('#models').val();
-  generateGraphParameters(graphData, selectedModel);
+//requests the preset list from the server
+function getPresetList(){
+  var empty = [];
+  $.ajax({
+        aync : true,
+        url : "/load",
+        type: "POST",
+        contentType:'application/json',
+        data: JSON.stringify(empty),
+        dataType:'json',
+        success : fillPresetList       
+    });
 }
+
+//fills the preset list with the response from the server
+function fillPresetList(data){
+  presets = data;
+  var nameList = Object.keys(data);
+  nameList.sort();
+  fillListParameters($('#preset-list'),nameList);
+}
+
 
 //generates the required graph parameters
 function generateGraphParameters(data, model){
@@ -205,114 +291,58 @@ function generateGraphParameters(data, model){
     $('#parameter-selection').append(formDiv);
   });
 
-  var submitButton = generateButton('param-select','btn','OK');
-  $('#parameter-selection').append(submitButton);
-
-  //handles parameter selection
-  $('#param-select').on('click', fetchParametersAndGetGraph);
-}
-
-//generates a label
-function generateLabel(forName,className,value){
-  var newLabel = document.createElement("label");
-  newLabel.innerHTML = value;
-  newLabel.setAttribute("for",forName);
-  newLabel.setAttribute("class",className);
-
-  return newLabel;
-}
-
-//generates the required input element
-function generateInputField(id,value,parameters){
-  var newInput;
-  switch(value){
-    case 'single':
-      newInput = generateDatalist(id);
-      newInput[1] = fillListParameters(newInput[1],parameters);
-      break;
-    case 'multiple':
-      newInput = generateSelect(id,true);
-      newInput[0] = fillListParameters(newInput[0],parameters);
-      break;
-  }
-
-  newInput = wrapInDiv(newInput, 'col-xs-10');
-  return newInput;
 }
 
 
-//generates an array with an input and datalist elements in it
-function generateDatalist(id){
-  var newInput = document.createElement('input');
-  newInput.setAttribute('class','form-control');
-  newInput.setAttribute('list',id);
-  newInput.setAttribute('id','input-'+id);
-
-  var newDatalist = document.createElement('datalist');
-  newDatalist.setAttribute('id',id);
-
-  return [newInput,newDatalist];
-}
-
-
-//generates an array with a select element in it
-function generateSelect(id,isMultiple){
-
-  var newSelect = document.createElement('select');
-  newSelect.setAttribute('id','input-'+id);
-  newSelect.setAttribute('class','form-control');
-  newSelect.multiple = isMultiple;
-
-  return [newSelect];
-}
-
-//creates options from the given parameters and appends them to the given list element
-function fillListParameters(element, parameters){
-  //empty the given list
-  $(element).empty();
-  //fill with given parameters
-  $.each(parameters, function(i,value){
-    var newOption = document.createElement("option");
-     newOption.innerHTML = value;
-    element.append(newOption);
-  });
-
-  return element;
-}
-
-//receives an array of elements,
-//wraps them in a div with 'className' and returns the div
-function wrapInDiv(elements, className){
-  var newDiv = document.createElement("div");
-  newDiv.setAttribute('class',className);
-
-  $.each(elements, function(i,value){
-    newDiv.append(value);
-  })
-
-  return newDiv;
-}
-
-//generates a button with the required id and class
-function generateButton(id,className,text){
-  var newButton = document.createElement('button');
-  newButton.setAttribute('id',id);
-  newButton.setAttribute('class',className);
-  newButton.innerHTML = text;
-
-  return newButton;
-}
-
-function generateParagraph(text){
-  var newP = document.createElement('p');
-  newP.innerHTML = text;
-
-  return newP;
-}
 
 //fixes the height of the graph display tab
 function fixHeight(){
   remaining_height = parseInt($(window).height() - 250); 
   $('#graph-display').height(remaining_height); 
+}
+
+function resetDisplay(){
+  //hide divs
+  $("#err-msg").hide();
+  $('#save-as-wrapper').hide();
+  $('#server-success').hide();
+  $('#loader').hide();
+}
+
+//returns true if form is filled, and false otherwise
+function isParametersFormValid(){
+  var isValid = true;
+  //for each parameter,  fill the json with the actual value
+  $.each(graphData.models[selectedModel],function(key,value){
+    switch(value.type){
+      case 'single':
+        if($('#input-'+key).val() === ''){
+          isValid=false;
+        };
+        break;
+      case 'multiple':
+        if($('#input-'+key+' :selected').length == 0){
+          isValid=false;
+        }
+        break;
+      case 'radio':
+        if($('#input-'+key).val() === ''){
+          isValid=false;
+        };
+        break;
+      case 'checkbox':
+        //get all the checked values
+        var allCheckedValues = [];
+        $('#input-'+key+' :selected').each(function(i, checked){
+          allCheckedValues[i] = $(checked).text();
+        });
+        break;
+      case 'range':
+        //add handling
+        break;
+    }
+  });
+
+  return isValid;
 }
 

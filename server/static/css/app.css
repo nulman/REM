@@ -25,6 +25,28 @@ html,body{
     
 }
 
+.btn{
+	background-color: black;
+	color: white;
+	margin: 5px;
+}
+
+.btn:hover{
+	background-color: #3db1c8;
+	color: white;
+}
+
+
+.nav-pills li a{
+	background-color: black;
+	color: white;
+}
+
+.nav-pills li a:hover{
+	background-color: white;
+	color: black;
+}
+
 /*header definitions*/
 .header{
 	background-color: black;
@@ -59,19 +81,8 @@ h1{
 #proj-select{
 	float: right;
 }
-	
 
-.btn{
-	background-color: black;
-	color: white;
-	margin: 5px;
-}
-
-.btn:hover{
-	background-color: #3db1c8;
-	color: white;
-}
-
+/*parameter selection definitions*/
 select,datalist{
 	color:black;
 	width:100%;
@@ -82,15 +93,6 @@ select,datalist{
 	color: black;
 }
 
-.nav-pills li a{
-	background-color: black;
-	color: white;
-}
-
-.nav-pills li a:hover{
-	background-color: white;
-	color: black;
-}
 
 #err-msg{
 	color:red;
@@ -140,7 +142,7 @@ select,datalist{
 	background-color: gray;
 }
 
-/**/
+
 #model-list li img{
   width: 100px;
   height: 100px;
@@ -167,4 +169,49 @@ select,datalist{
 
 hr{
 	margin: 10px;
+}
+
+#toggle-explorer{
+	float:left;
+}
+
+#reload-plugins,#save-preset, #delete-preset,#reload-preset{
+	float:right;
+}
+
+#save-as-background{
+	opacity:0.6;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	background: #000;
+}
+
+#save-as-preset-form{
+	opacity: 1;
+	width:350px;
+	margin: 0 auto;
+	padding: 10px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	background-color: #262626;
+	border: 5px solid #3db1c8;
+}
+
+input{
+	color: black;
+}
+
+#server-success{
+	border-radius: 5px;
+	background-color: rgba(255,255,255,0.1);
+	padding: 5px;
+	text-align: center;
+}
+
+#preset-list{
+	resize:both;
 }

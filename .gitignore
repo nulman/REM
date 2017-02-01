@@ -1,2 +1,7 @@
 *.pyc
 *.pyc
+server/experiments/4G/exp-plotter
+server/experiments/4G/exp-plotter
+server/experiments/5G/exp-plotter
+server/experiments/6G/exp-plotter
+server/experiments/7G/exp-plotter

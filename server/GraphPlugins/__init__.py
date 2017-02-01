@@ -5,6 +5,11 @@ modules = glob.glob(dirname(__file__)+"/*.py")
 __all__ = [ basename(f)[:-3] for f in modules if isfile(f)]
 del glob, dirname, basename, isfile, modules
 __all__.remove('__init__')
+try:
+    #template is the reference module, it should not be used directly
+    __all__.remove('template')
+except ValueError:
+    pass
 
 graphtypes = {}
 for item in __all__:
@@ -14,10 +19,5 @@ for item in __all__:
         print e
         print 'The module file must contain a class with the same name as the module.\nskipping module {}'.format(item)
         continue
-    #print type(mod)
-    #print mod
+
     graphtypes.update(getattr(mod,item)().getparameters())
-#print '__all__: {}'.format(__all__)    
-#print graphtypes
- #   [{'Line': {'group-by': 'multiple', 'x-axis': 'single', 'y-axis': 'signle'}},{'Line2': {'group-by': 'multiple', 'x-axis': 'single', 'y-axis': 'signle'}}]
- #    {'Line': {'group-by': 'multiple', 'x-axis': 'single', 'y-axis': 'signle'}, 'Line2': {'group-by': 'multiple', 'x-axis': 'single', 'y-axis': 'signle'}}

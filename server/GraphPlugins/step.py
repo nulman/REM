@@ -20,8 +20,8 @@ class Step(object):
         params = OrderedDict()
         params['x_axis'] = {'type':'single','source':'cols'}
         params['y_axis'] = {'type':'single','source':'cols'}
-        params['group_by'] ={'type':'single','source':'machines'}
-        return {'step':params}
+        params['group_by'] ={'type':'single','source':'name'}
+        return {'Step':params}
         
     def plot(self, filename, sqlpath, x_axis, y_axis, group_by):
 
@@ -35,26 +35,22 @@ class Step(object):
         try:
             #for params in parameters:
             #take only rows that contain these columns
-                
-                #frame_slice = pd.read_sql_query("select `{x}`,`{y}` from data where `{x}` != '' and `{y}` != '' and `name` = '{group_by}' order by `{x}` asc".format(**parameters), conn)
-                frame_slice = pd.read_sql_query("select `timestamp`,`performance` from data where `timestamp` != '' and `performance` != '' and `name` = 'vm-1' order by `timestamp` asc", conn)
-                
-                #print "select `{x}`,`{y}` from data where `{x}` != '' and `{y}` != '' and `name` = '{group_by}' order by `{x}` asc".format(**parameters)
-                #print frame_slice 
-                #return
-                #frame_slice = frame[frame[params['y']] > 0.0]
-                #frame_slice = frame_slice[frame_slice[params['x']] > 0.0]
-                #frame_slice = frame_slice[frame_slice.name == params['machine']][[params['x'], params['y']]]
-                #print frame_slice
-                #fig.line(source=ColumnDataSource(frame_slice), x=params['x'],y=params['y'], line_width=2, legend=params['machine'], color=params['color'])
+                query = "select `{x}`,`{y}` from data where `{x}` != '' and `{y}` != '' and `name` = '{group_by}' order by `{x}` asc".format(**parameters)
+                print query
+                frame_slice = pd.read_sql_query(query, conn)
+                #frame_slice = pd.read_sql_query("select `timestamp`,`performance` from data where `timestamp` != '' and `performance` != '' and `name` = 'vm-1' order by `timestamp` asc", conn)
+                                                 #select `timestamp`,`performance` from data where `timestamp` != '' and `performance` != '' and `name` = 'vm-2' order by `timestamp` asc
         except Exception as e:
             print e
             conn.close()
         conn.close()
         #frame_slice = pd.DataFrame(frame_slice)
-        #print frame_slice
-        #fig = charts.Step(data=frame_slice, x=x_axis, y=y_axis)
-        fig = charts.Step(data=frame_slice, x='timestamp', y='performance')
+#        print frame_slice
+#        print x_axis
+#        print y_axis
+
+        fig = charts.Step(data=frame_slice, x='{}'.format(x_axis), y='{}'.format(y_axis))
+#        fig = charts.Step(data=frame_slice, x='timestamp', y='performance')
         #fig = Bokehstep(frame_slice, x=x_axis, y=y_axis, legend=True, tools=['hover','crosshair','wheel_zoom','box_zoom','pan','save','resize','reset'])
         name = '{}_{}_{}_{}'.format(filename,self.getparameters().keys()[0],x_axis,y_axis)
         name = name.replace(':','')
@@ -71,10 +67,6 @@ class Step(object):
         #charts.show(fig)
         return {'div':div, 'js':js_path}
         
-if __name__ == '__main__':
-    s = step()
-    print s.plot('thing','z:\\GIT\\REM\\server\\experiments\\exp1\\exp-plotter.db','timestamp','performance','vm-1')
-    
     
     
     

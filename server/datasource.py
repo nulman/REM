@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Nov 21 13:12:27 2016
 
-@author: anulman
-"""
 
 import pandas as pd
 import numpy as np
@@ -19,6 +15,11 @@ from json import dumps
 #import GraphPlugins
 
 class datasource(object):
+    '''
+    parses an experiment file into an sql table,
+    or set path to the correct database if this is a previously parsed experiment
+    takes file path as a parameter
+    '''
     experiment_file = ''
     machines = []
     columns = []
@@ -33,6 +34,7 @@ class datasource(object):
         self.dirpath = dirname(file_path)
         self.sqlpath = file_path+'.db'
         start_pos = 0
+        #check if this is a new experiment file, if it is or there is an error it will reparse it
         try:
             if isfile(self.sqlpath):
                 conn = sqlite3.connect(self.sqlpath)
@@ -44,14 +46,15 @@ class datasource(object):
                 #print 'archived={} {} current={} {}'.format(archived_size,type(archived_size),current_size,type(current_size))
                 if archived_size < current_size: #exoerimetn fle grew since last time we scanned it
                     start_pos = archived_size + 1
-                    print '-D- changed old file, seeking to {}'.format(start_pos)
+#                    print '-D- changed old file, seeking to {}'.format(start_pos)
                 elif archived_size > current_size: #experiment file shrunk, this should never happen
                     raise Exception('test file shrunk!')
                 elif archived_size == current_size and current_timestamp > archived_timestamp:
-                    print '-D- current_timestamp:{} archived_timestamp{}'.format(current_timestamp,archived_timestamp)
+#                    print '-D- current_timestamp:{} archived_timestamp{}'.format(current_timestamp,archived_timestamp)
                     raise Exception('test file timestamp changed!')
                 else: #nothing changed since lst scan
-                    print '-D- old, unchanged file'
+#                    print '-D- old, unchanged file'
+                    self.getcol()
                     return
         except sqlite3.OperationalError as e:
             print e
@@ -60,27 +63,24 @@ class datasource(object):
         except Exception as e:
             print e
             remove(self.sqlpath)
+        #parse experiment file and get column names
         self.analyze(start_pos)
+        self.getcol()
                 
             
         
     def getcol(self):
+        '''returns the column names and the names of the vms (vm-1. vm-2 ...)'''
         conn = sqlite3.connect(self.sqlpath)
         self.columns = pd.read_sql_query("select * from columns", conn)['0'].tolist()
         self.machines = pd.read_sql_query("select * from machines", conn)['0'].tolist()
         conn.close()
         
 
-    #flattens dicts
+    #flattens multilevel dicts
     def flatten(self,d, parent_key='', sep='_'):
         items = []
         for k, v in d.items():
-            #if k == 'arguments':
-                #print 'arguments={} is a {}'.format(v,type(v))
-            #if type(v) == str:
-                #next
-            #if k not in ['cache_alloc','name','type','timestamp']:
-                #continue
             new_key = parent_key + sep + k if parent_key else k
             if isinstance(v, MutableMapping):
                 items.extend(self.flatten(v, new_key, sep=sep).items())
@@ -119,13 +119,6 @@ class datasource(object):
         frame = pd.DataFrame(dictlist)
         del dictlist
         frame.sort_values('timestamp', inplace=True)
-        
-        #display column names for selection
-        #self.columns = frame.columns.tolist()
-       #print frame.columns.values[12]
-        #display machines
-        #self.machines = frame['name'].unique().tolist()
-        #print frame
         conn = sqlite3.connect(self.sqlpath)
         try:
             self.columns = frame.columns.tolist()
@@ -143,6 +136,10 @@ class datasource(object):
         
         
     def plot(self, x, y, machines):
+        '''
+        deprecated and no longer used.
+        left behind in case its required as referance, will be removed in the final product
+        '''
         if type(machines) == str or type(machines) == unicode: machines = [machines]
         print "-D- x:|{}| y:|{}| machines:|{}|".format(x,y,machines)
         print type(machines)

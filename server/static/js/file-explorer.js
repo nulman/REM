@@ -26,7 +26,6 @@ $(document).ready(function() {
    	callUrlUpdate(url);
    }else{
    	  //do nothing - file is selected
-
    }
   });
 
@@ -38,8 +37,20 @@ $(document).ready(function() {
   });
 
   //handles project selection- 'accept' button
-  $('#proj-select').on('click', function () {
-    //get the path of the project
+  $('#proj-select').on('click', sendExperimentToServer);
+
+  //toggles file explorer
+  $( "#toggle-explorer" ).click(function() {
+    $("#explorer-wrapper").toggle( "slide");
+    $("#toggle-explorer i").toggleClass("glyphicon-arrow-left glyphicon-arrow-right");
+  });
+
+
+});
+
+
+function sendExperimentToServer(){
+  //get the path of the project
     var node = $('#jstree').jstree('get_selected',true);
     var id = node[0].id;
 
@@ -48,7 +59,7 @@ $(document).ready(function() {
       //get parameter list from the server, and fill parameters list
       url = "/getcolumns?experiment="+id;
       $('#loader').show();
-      $("#param-select").addClass('disabled');
+      //$("#param-select").addClass('disabled');
 
       $.ajax({
         url: url,
@@ -56,20 +67,8 @@ $(document).ready(function() {
         error: serverErrorHandler
       });
     }
-  });
+}
 
-  var duration = 'slow';
-
-  //toggles file explorer
-  $( "#toggle-explorer" ).click(function() {
-    $("#explorer-wrapper").toggle( "slide");
-    
-    // $('#toggle-explorer').empty();
-    // $('#toggle-explorer').append('<i class="glyphicon glyphicon-arrow-right white"></i>');
-  });
-
-
-});
 
 
 //makes the request to the server with the given url

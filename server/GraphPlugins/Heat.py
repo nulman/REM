@@ -22,7 +22,7 @@ class Heat(object):
         params = OrderedDict()
         params['x_axis'] = {'type':'single','source':'cols'}
         params['y_axis'] = {'type':'single','source':'cols'}
-        params['group_by'] ={'type':'multiple','source':'machines'}
+        params['group_by'] ={'type':'multiple','source':'name'}
         return {'Heat':params}
         
     def plot(self, filename, sqlpath, x_axis, y_axis, group_by):

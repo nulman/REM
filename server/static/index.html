@@ -5,6 +5,7 @@
  	<script src="js/jquery-ui.min.js"></script>
  	<script src="dist/jstree.min.js"></script>
  	<script type="text/javascript" src="js/file-explorer.js"></script>
+ 	<script type="text/javascript" src="js/helper-generation-functions.js"></script>
  	<script type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
  	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
@@ -27,7 +28,7 @@
 		<div class="row">
 			<!-- file explorer -->
 			<div id="explorer-wrapper" class="col-md-3">
-				<div id="file-explorer" class="section">
+				<div id="file-explorer">
 					<button id="up-dir" class='btn'>
 							<i class="glyphicon glyphicon-arrow-up white"></i>
 					</button>
@@ -37,50 +38,96 @@
 			</div>
 			<!-- right panel -->
 			<div class="right-panel col-md-8">
+				<!-- toggle button for file explorer -->
 				<button id="toggle-explorer" class="btn">
 					<i class="glyphicon glyphicon-arrow-left white"></i>
 				</button>
+
 				<!-- tab header -->
-				<ul class="nav nav-pills color">
+				<ul class="nav nav-pills nav-justified">
 					<li><a data-toggle="pill" href="#graph-selection">Parameter Selection</a></li>
 					<li><a data-toggle="pill" href="#graph-display">Graph Display</a></li>
 				</ul>
 
 
 				<!-- tab contents -->
-				<!-- hidden divs - errors and loaders -->
+
+				<!-- hidden divs - errors info and loaders -->
 				<div id="err-msg">Server error</div>
 				<div id='loader' class="loader"></div>
+				<div id='server-success'></div>
 
 
 				<div class="tab-content">
+
 					<!-- parameter selection tab -->
-					<div id="graph-selection" class="section tab-pane fade">
-						<form action="" id='models-form'>
-							<div id="model-selection" class="section desc">
-								<p>Select graph model:</p>
-								<!-- model selection -->
-								<!-- <div class="form-group row">
-									<label for="models" class="col-xs-2 col-form-label">Model: </label>
-									<div class="col-xs-10">
-										<select name="models" id="models" class='form-control'>
-										</select>
-									</div>
-									<br>
-								</div> -->
-								<ul id='model-list'>
-									
-								</ul>
-							</div>
+					<div id="graph-selection" class="tab-pane fade">
+
+						<!-- inner tab headers -->
+						<ul class="nav nav-pills">
+							<li><a data-toggle="pill" href="#create-new">Create New</a></li>
+							<li><a data-toggle="pill" href="#load-preset">Load Preset</a></li>
+						</ul>
+
+						<div class="tab-content">
+						<!-- inner tab - create a new model -->
+						<div id="create-new" class="tab-pane fade">
+							<form action="" id='models-form'>
+								<div id="model-selection">
+									<button id='reload-plugins' class='btn' title="reload plugin list">
+										<i class="glyphicon glyphicon-refresh white"></i>
+									</button>
+									<p>Select graph model:</p>
+									<!-- model selection -->
+									<ul id='model-list'>
+										
+									</ul>
+								</div>
+							</form>
+							<hr>
+							<form action="" id='parameters-form'>
+								<div id="parameter-selection">
+								</div>
+								<button class='btn disabled' id='param-select'>OK</button>
+								<button class='btn disabled' id='save-preset'>Save</button>
+							</form>
+						</div>
+
+						<!-- hidden div - save preset popup -->
+						<div id='save-as-wrapper'>
+						<div id="save-as-background">		
+						</div>
+						<form id="save-as-preset-form">
+						<p>Enter preset name:</p><br>
+						<input type="text" id="preset-name" placeholder="E.g.- 'my preset'"/><br/>
+						<br/>
+						<button class='btn' id='save-as-ok'>OK</button>
+						<button class='btn' id='save-as-cancel'>Cancel</button>
+						<br/>
+
 						</form>
-						<hr>
-						<form action="" id='parameters-form'>
-							<div id="parameter-selection" class="section desc">
-							</div>
-						</form>
+						</div>
+
+						<!-- inner tab - load an existing model -->
+						<div id='load-preset' class="tab-pane fade">
+							<button id='reload-preset' class='btn' title="reload preset list">
+								<i class="glyphicon glyphicon-refresh white"></i>
+							</button>
+							<form action="" id='saved-presets'>
+								<div id="saved-preset-selection">
+									<select id='preset-list' size='10'>
+										
+									</select>
+								</div>
+								<button class='btn disabled' id='select-preset'>Load</button>
+								<button class='btn disabled' id='delete-preset'>Delete</button>
+							</form>
+						</div>
+						</div>
 					</div>
+					
 					<!-- graph display tab -->
-					<div id="graph-display" class="section tab-pane fade">
+					<div id="graph-display" class="tab-pane fade">
 					</div>
 				</div>
 			</div>

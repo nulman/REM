@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
-"""
-Spyder Editor
 
-This is a temporary script file.
-"""
 
 from os import listdir, walk, environ
-from os.path import isfile, join, isdir, abspath, dirname, basename
-from os import chdir
+from os.path import join, basename#, dirname, isfile, isdir, abspath
+#from os import chdir
 from json import dumps
-from flask import Flask, app
-#chdir('Z:\\REM\\server')
+#from flask import Flask, app
 root_dir = environ['experiment_root_dir']
 #root_dir = dirname(abspath(__file__))
 root_name = basename(root_dir)
 
 def getSubtree(current_path = ''):
+    '''
+    generates file/folder subtrees for the file walker
+    '''
     json_string = []
     if current_path == '':
         path_to_list = root_dir
