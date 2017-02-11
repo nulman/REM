@@ -102,7 +102,10 @@ def listcols():
 #    print "-D- experiment: {}".format(requested_path)
     requested_path = requested_path.replace('#','')
 #    print "-D- experiment: {}".format(requested_path)
-    data = datasource(requested_path)
+    try:
+        data = datasource(requested_path)
+    except SyntaxError as e:
+        abort(500, description="malformed experiment file\n"+str(e))
     #data.getcol()
     res = {'cols':data.columns, 'name':data.machines, 'models':GraphPlugins.graphtypes}
     return Response(dumps(res), mimetype='application/json')
@@ -125,7 +128,7 @@ def loadpreset():
     else:
         global data
         if type(data) == str:
-            abort(403)
+            abort(403, description="no experiment selected. please select and experiment from the file browser and click ok")
         sieve = {x:1 for x in data.columns}
         for index, row in frame.iterrows():
             i = 0
@@ -153,7 +156,7 @@ def savepreset():
     """
     parameters = request.get_json()
     if type(parameters) != dict:
-        abort(403)
+        abort(403, description="i was expecting a dict and instead i got a"+type(parameters))
     items = []
 #    print parameters
     name = parameters['name']
@@ -196,7 +199,7 @@ def deletepreset():
 #    print parameters
 #    print type(parameters)
     if type(parameters) != list or len(parameters) == 0:
-        abort(403)
+        abort(403, description="i was expecting a non-empty list")
     try:
         conn = sqlite3.connect('internals.db')
         for name in parameters:
@@ -213,7 +216,7 @@ def plot():
     module_reloader()
     global data
     if not hasattr(data, 'columns') or len(data.columns) == 0:
-        abort(403)
+        abort(403, description="no experiment selected. please select and experiment from the file browser and click ok")
     parameters = request.get_json(force=True)
     graphtype = parameters.keys()[0]
     graph = getattr(getattr(GraphPlugins,graphtype),graphtype)() #this will create an instance of the requested graph type

@@ -10,7 +10,7 @@ $(document).ready(function() {
 
   $('#loader').hide();
   //get root path
-  callUrl("");
+  callListdir("",drawTree);
   //fixes explorer height to fill whole screen
   maxHeight('#file-explorer');
 
@@ -23,7 +23,7 @@ $(document).ready(function() {
    if(node[0].type == 'default'){
    	var url = node[0].id;
    	currDir = url;
-   	callUrlUpdate(url);
+   	callListdir(url,updateTree);
    }else{
    	  //do nothing - file is selected
    }
@@ -33,7 +33,7 @@ $(document).ready(function() {
   $('#up-dir').on('click',function(){
     id = currDir.replace(patt, "");  
     currDir = id;
-    callUrlUpdate(currDir + "\\");
+    callListdir(currDir + "\\",updateTree);
   });
 
   //handles project selection- 'accept' button
@@ -48,7 +48,8 @@ $(document).ready(function() {
 
 });
 
-
+//sends the selected experiment path to the server to get the experiment parameters
+//upon success, moves to handleParameters which generates the corresponding UI
 function sendExperimentToServer(){
   //get the path of the project
     var node = $('#jstree').jstree('get_selected',true);
@@ -59,8 +60,8 @@ function sendExperimentToServer(){
       //get parameter list from the server, and fill parameters list
       url = "/getcolumns?experiment="+id;
       $('#loader').show();
-      //$("#param-select").addClass('disabled');
 
+      //send to server
       $.ajax({
         url: url,
         success: handleParameters,
@@ -70,30 +71,15 @@ function sendExperimentToServer(){
 }
 
 
-
-//makes the request to the server with the given url
-//then draws the tree with the response json
-function callUrl(url){
-  $.ajax({
-        aync : true,
-        type : "GET",
-        url : "/listdir?id=" + url,
-        dataType : "json",    
-
-        success : drawTree      
-    });
-}
-
-//makes the request to the server with the given url
-//then updates the existing tree with the response json
-function callUrlUpdate(url){
+//makes a request to the server to get the tree information with the given url
+//if the request was successful, the success function is then called
+function callListdir(url,successFunction){
   $.ajax({
         async : true,
         type : "GET",
         url : "/listdir?id=" + url,
         dataType : "json",    
-
-        success : updateTree      
+        success : successFunction      
     });
 }
 
@@ -112,7 +98,7 @@ function updateTree(data){
   $('#jstree').jstree(true).refresh();
 }
 
-//draws the initial tree
+//draws the initial tree with the data received from the server - called once
 function drawTree(data){
   $(function() {
       $('#jstree')
@@ -131,7 +117,6 @@ function drawTree(data){
           'sort' : function(a, b) {
             return this.get_type(a) === this.get_type(b) ? (this.get_text(a) > this.get_text(b) ? 1 : -1) : (this.get_type(a) >= this.get_type(b) ? 1 : -1);
           },
-          
           'types' : {
             'default' : { 'icon' : 'glyphicon glyphicon-folder' },
             'file' : { 'valid_children' : [], 'icon' : 'glyphicon glyphicon-file' }
