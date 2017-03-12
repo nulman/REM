@@ -10,15 +10,15 @@ root_dir = environ['experiment_root_dir']
 #root_dir = dirname(abspath(__file__))
 root_name = basename(root_dir)
 
-def getSubtree(current_path = ''):
+def getSubtree(current_path = []):
     '''
     generates file/folder subtrees for the file walker
     '''
     json_string = []
-    if current_path == '':
+    if current_path == [] or current_path == '':
         path_to_list = root_dir
     else:
-        path_to_list = current_path
+        path_to_list = join(*current_path)
     #print '-D- ' + path_to_list
     '''if current_path == root_dir:
         json_string = [{'text':root_name ,'children':json_string, 

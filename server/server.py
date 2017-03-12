@@ -11,6 +11,7 @@ from sys import modules, argv
 #    print argv
 #    os.chdir(argv[1])
 import sqlite3
+from re import split
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, current_app, Response
 from json import dumps, loads
@@ -56,17 +57,23 @@ def main_page():
         print "{} {}".format(request.method, type(request.method))
     return redirect(os.path.join('static', 'index.html'))
     
-@app.route('/listdir',methods=['GET'])
+@app.route('/listdir',methods=['POST'])
 def listdir():
     '''
     generates subtrees for the file browser
     '''
     
-    requested_path = request.args.get('id')
-    if requested_path == None:
-        requested_path = ''
+##    requested_path = request.args.get('id')
+##    if requested_path == None:
+##        requested_path = []
+    requested_path = request.get_json(force=True)
+    if requested_path != []:
+        requested_path = split(r'[\\\/]+', requested_path)
+        #windows compatability
+        if requested_path[0].endswith(':'):
+            requested_path.insert(1,os.sep)
     #print "-D- requested_path: {}".format(requested_path)
-    requested_path = requested_path.replace('#','')
+##    requested_path = requested_path.replace('#','')
     #print "-D- id: {}".format(requested_path)
     res = getSubtree(requested_path)
     return Response(res, mimetype='application/json')

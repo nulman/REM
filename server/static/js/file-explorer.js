@@ -1,7 +1,7 @@
 // holds all the file-explorer creation and update functions
 
 
-var currDir;                //holds the current directory
+var currDir;                //holds the current directory- a list of folders
 var patt = /\\[^\\]+$/;
 
 
@@ -10,7 +10,8 @@ $(document).ready(function() {
 
   $('#loader').hide();
   //get root path
-  callListdir("",drawTree);
+  var empty = [];
+  callListdir(empty,drawTree);
   //fixes explorer height to fill whole screen
   maxHeight('#file-explorer');
 
@@ -73,11 +74,13 @@ function sendExperimentToServer(){
 
 //makes a request to the server to get the tree information with the given url
 //if the request was successful, the success function is then called
-function callListdir(url,successFunction){
+function callListdir(data,successFunction){
   $.ajax({
         async : true,
-        type : "GET",
-        url : "/listdir?id=" + url,
+        type : "POST",
+        url : "/listdir",
+        contentType:'application/json',
+        data: JSON.stringify(data),
         dataType : "json",    
         success : successFunction      
     });
