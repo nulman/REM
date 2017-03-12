@@ -15,7 +15,7 @@ from re import split
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, current_app, Response
 from json import dumps, loads
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, join, realpath
 import pandas as pd
 from config import config
 import GraphPlugins
@@ -126,7 +126,7 @@ def loadpreset():
     """
     res = {}
     columns = request.get_json(force=True)
-    conn = sqlite3.connect('internals.DB')
+    conn = sqlite3.connect(join(dirname(realpath(__file__))), 'internals.DB')
     frame = pd.read_sql_query('select * from presets order by name', conn)
     conn.close()
     if type(columns) == list and len(columns) == 1 and columns[0] == 'all':
