@@ -2,7 +2,7 @@
 
 
 var currDir;                //holds the current directory- a list of folders
-var patt = /\\[^\\]+$/;
+var patt = /\\[^\\]+$|\/[^\/]+$/;
 
 
 $(document).ready(function() {
@@ -34,7 +34,7 @@ $(document).ready(function() {
   $('#up-dir').on('click',function(){
     id = currDir.replace(patt, "");  
     currDir = id;
-    callListdir(currDir + "\\",updateTree);
+    callListdir(currDir,updateTree);
   });
 
   //handles project selection- 'accept' button
