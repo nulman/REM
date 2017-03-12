@@ -20,6 +20,7 @@ import pandas as pd
 from config import config
 import GraphPlugins
 from path import path
+os.chdir(dirname(realpath(__file__))
 app = Flask(__name__)
 app.config.from_object(__name__)
 
@@ -126,7 +127,7 @@ def loadpreset():
     """
     res = {}
     columns = request.get_json(force=True)
-    conn = sqlite3.connect(join(dirname(realpath(__file__)), 'internals.DB'))
+    conn = sqlite3.connect('internals.DB')
     frame = pd.read_sql_query('select * from presets order by name', conn)
     conn.close()
     if type(columns) == list and len(columns) == 1 and columns[0] == 'all':
