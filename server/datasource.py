@@ -90,6 +90,7 @@ class datasource(object):
         
         
     def analyze(self, start_pos):
+        '''analyzes the experiment file and creates an sql file with the data'''
         #initializing a few things
         dictlist = []
         filesize = stat(self.experiment_file).st_size
@@ -140,7 +141,8 @@ class datasource(object):
         deprecated and no longer used.
         left behind in case its required as referance, will be removed in the final product
         '''
-        if type(machines) == str or type(machines) == unicode: machines = [machines]
+        if type(machines) in [str, unicode]:
+            machines = [machines]
         print "-D- x:|{}| y:|{}| machines:|{}|".format(x,y,machines)
         print type(machines)
         #frame = self.dataframe

@@ -54,7 +54,7 @@ class Step(object):
         #fig = Bokehstep(frame_slice, x=x_axis, y=y_axis, legend=True, tools=['hover','crosshair','wheel_zoom','box_zoom','pan','save','resize','reset'])
         name = '{}_{}_{}_{}'.format(filename,self.getparameters().keys()[0],x_axis,y_axis)
         name = name.replace(':','')
-        charts.output_file('static\\'+name+'.html', title=name, mode='cdn', root_dir=None)
+        charts.output_file(join('static',name+'.html'), title=name, mode='cdn', root_dir=None)
         save(fig)
         js,div =components(fig, wrap_script = False, wrap_plot_info = True)
         div_path = join('bokeh','{}_div.html'.format(name))

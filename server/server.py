@@ -15,7 +15,7 @@ from re import split
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, current_app, Response
 from json import dumps, loads
-from os.path import abspath, dirname, join, realpath
+from os.path import abspath, dirname, join
 import pandas as pd
 from config import config
 import GraphPlugins
@@ -23,9 +23,8 @@ from path import path
 
 app = Flask(__name__)
 app.config.from_object(__name__)
-os.chdir(dirname(realpath(__file__)))
-app.root_path = dirname(realpath(__file__))
 
+#app.root_path = dirname(realpath(__file__))
 #app.config.update(dict(
 #    SECRET_KEY='this is my secret key, there are many like it, but this one is mine',
 #    USERNAME='admin',

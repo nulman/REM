@@ -66,7 +66,7 @@ class template(object):
         #omit the lines up to the next comment if you do not want to save the graph as an html to disk
         name = '{}_{}_{}_{}'.format(filename,self.getparameters().keys()[0],x_axis,y_axis)
         name = name.replace(':','')
-        charts.output_file('static\\'+name+'.html', title=name, mode='cdn', root_dir=None)
+        charts.output_file(join('static', name+'.html'), title=name, mode='cdn', root_dir=None)
         save(fig)
         #this is where the graph is broken into embeddable components
         js,div =components(fig, wrap_script = False, wrap_plot_info = True)

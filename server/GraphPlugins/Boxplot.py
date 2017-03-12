@@ -89,7 +89,7 @@ class Boxplot(object):
         self.getparameters().keys()[0]
         name = '{}_{}_{}_{}'.format(filename,self.getparameters().keys()[0],x_axis,y_axis)
         name = name.replace(':','')
-        plotting.output_file('static\\'+name+'.html', title=name, mode='cdn', root_dir=None)
+        plotting.output_file(join('static', name+'.html'), title=name, mode='cdn', root_dir=None)
         save(p)
         js,div =components(p, wrap_script = False, wrap_plot_info = True)
         div_path = join('bokeh','{}_div.html'.format(name))

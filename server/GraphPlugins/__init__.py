@@ -1,7 +1,7 @@
-from os.path import dirname, basename, isfile
+from os.path import dirname, basename, isfile, join
 import glob
 
-modules = glob.glob(dirname(__file__)+"/*.py")
+modules = glob.glob(join(dirname(__file__),"*.py"))
 __all__ = [ basename(f)[:-3] for f in modules if isfile(f)]
 del glob, dirname, basename, isfile, modules
 __all__.remove('__init__')
@@ -19,5 +19,9 @@ for item in __all__:
         print e
         print 'The module file must contain a class with the same name as the module.\nskipping module {}'.format(item)
         continue
-
-    graphtypes.update(getattr(mod,item)().getparameters())
+    try:
+        graphtypes.update(getattr(mod,item)().getparameters())
+    except AttributeError as e:
+        print e
+        print "make sure your plugin is well defined! things are case sensetive!"
+        exit

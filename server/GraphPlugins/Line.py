@@ -63,7 +63,7 @@ class Line(object):
         dump = dump.reset_index(drop=True)
         dump.to_json('static\\'+name+'.json')
         del(dump)
-        plotting.output_file('static\\'+name+'.html', title=name, mode='cdn', root_dir=None)
+        plotting.output_file(join('static', name+'.html'), title=name, mode='cdn', root_dir=None)
         save(fig)
         js,div =components(fig, wrap_script = False, wrap_plot_info = True)
         div_path = join('bokeh','{}_div.html'.format(name))

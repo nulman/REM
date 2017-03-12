@@ -1,137 +1,144 @@
 <!DOCTYPE html>
 <html>
- <head>
- 	<script src="dist/libs/jquery-3.1.1.min.js"></script>
- 	<script src="js/jquery-ui.min.js"></script>
- 	<script src="dist/jstree.min.js"></script>
- 	<script type="text/javascript" src="js/file-explorer.js"></script>
- 	<script type="text/javascript" src="js/helper-generation-functions.js"></script>
- 	<script type="text/javascript" src="js/parameter-handling.js"></script>
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
- 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
-	<link rel="stylesheet" href="dist/themes/default-dark/style.min.css" />
-	<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.4.min.js"></script>
-	<script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-compiler-0.12.4.min.js"></script>
-	<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.4.min.css" type="text/css" />
-	<link rel="stylesheet" href="css/app.css" />
-	
-	
- </head>
 
- <body>
- <!-- header -->
- <div class="header">
- 		<img id='logo' src="img/Logo.png">
- 		<h1>Graph generation interface</h1>
- </div>
-	<div class="container-fluid main">
-		<div class="row">
-			<!-- file explorer -->
-			<div id="explorer-wrapper" class="col-md-3">
-				<div id="file-explorer">
-					<button id="up-dir" class='btn'>
-							<i class="glyphicon glyphicon-arrow-up white"></i>
-					</button>
-					<button id="proj-select" class="btn">OK</button>
-					<div id="jstree"></div>
-				</div>
-			</div>
-			<!-- right panel -->
-			<div class="right-panel col-md-8">
-				<!-- toggle button for file explorer -->
-				<button id="toggle-explorer" class="btn">
-					<i class="glyphicon glyphicon-arrow-left white"></i>
-				</button>
+<head>
+  <!-- jquery -->
+  <script src="lib/js/libs/jquery-3.1.1.min.js"></script>
+  <script src="lib/js/jquery-ui.min.js"></script>
+  <!-- bootstrap -->
+  <script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="lib/css/bootstrap.min.css" />
+  <!-- jstree -->
+  <script src="lib/js/jstree.min.js"></script>
+  <link rel="stylesheet" href="lib/js/themes/default-dark/style.min.css" />
+  <!-- bokeh -->
+  <script type="text/javascript" src="lib/js/bokeh-0.12.4.min.js"></script>
+  <script type="text/javascript" src="lib/js/bokeh-widgets-0.12.4.min.js"></script>
+  <link rel="stylesheet" href="lib/css/bokeh-0.12.4.min.css" type="text/css" />
+  <link rel="stylesheet" href="lib/css/bokeh-widgets-0.12.4.min.css" type="text/css" />
 
-				<!-- tab header -->
-				<ul class="nav nav-pills nav-justified">
-					<li><a data-toggle="pill" href="#graph-selection">Parameter Selection</a></li>
-					<li><a data-toggle="pill" href="#graph-display">Graph Display</a></li>
-				</ul>
+  <!-- original -->
+  <script type="text/javascript" src="js/file-explorer.js"></script>
+  <script type="text/javascript" src="js/helper-generation-functions.js"></script>
+  <script type="text/javascript" src="js/parameter-handling.js"></script>
+  <link rel="stylesheet" href="css/app.css" />
 
 
-				<!-- tab contents -->
+</head>
 
-				<!-- hidden divs - errors info and loaders -->
-				<div id="err-msg">Server error</div>
-				<div id='loader' class="loader"></div>
-				<div id='server-success'></div>
+<body>
+  <!-- header -->
+  <div class="header">
+    <img id='logo' src="img/Logo.png">
+    <h1>Graph generation interface</h1>
+  </div>
+  <div class="container-fluid main">
+    <div class="row">
+      <!-- file explorer -->
+      <div id="explorer-wrapper" class="col-md-3">
+        <div id="file-explorer">
+          <button id="up-dir" class='btn'>
+            <i class="glyphicon glyphicon-arrow-up white"></i>
+          </button>
+          <button id="proj-select" class="btn">OK</button>
+          <div id="jstree"></div>
+        </div>
+      </div>
+      <!-- right panel -->
+      <div class="right-panel col-md-8">
+        <!-- toggle button for file explorer -->
+        <button id="toggle-explorer" class="btn">
+          <i class="glyphicon glyphicon-arrow-left white"></i>
+        </button>
+
+        <!-- tab header -->
+        <ul class="nav nav-pills nav-justified">
+          <li><a data-toggle="pill" href="#graph-selection">Parameter Selection</a></li>
+          <li><a data-toggle="pill" href="#graph-display">Graph Display</a></li>
+        </ul>
 
 
-				<div class="tab-content">
+        <!-- tab contents -->
 
-					<!-- parameter selection tab -->
-					<div id="graph-selection" class="tab-pane fade">
+        <!-- hidden divs - errors info and loaders -->
+        <div id="err-msg">Server error</div>
+        <div id='loader' class="loader"></div>
+        <div id='server-success'></div>
 
-						<!-- inner tab headers -->
-						<ul class="nav nav-pills">
-							<li><a data-toggle="pill" href="#create-new">Create New</a></li>
-							<li><a data-toggle="pill" href="#load-preset">Load Preset</a></li>
-						</ul>
 
-						<div class="tab-content">
-						<!-- inner tab - create a new model -->
-						<div id="create-new" class="tab-pane fade">
-							<form action="" id='models-form'>
-								<div id="model-selection">
-									<button id='reload-plugins' class='btn' title="reload plugin list">
-										<i class="glyphicon glyphicon-refresh white"></i>
-									</button>
-									<p>Select graph model:</p>
-									<!-- model selection -->
-									<ul id='model-list'>
-										
-									</ul>
-								</div>
-							</form>
-							<hr>
-							<form action="" id='parameters-form'>
-								<div id="parameter-selection">
-								</div>
-								<button class='btn disabled' id='param-select'>OK</button>
-								<button class='btn disabled' id='save-preset'>Save</button>
-							</form>
-						</div>
+        <div class="tab-content">
 
-						<!-- hidden div - save preset popup -->
-						<div id='save-as-wrapper'>
-						<div id="save-as-background">		
-						</div>
-						<form id="save-as-preset-form">
-						<p>Enter preset name:</p><br>
-						<input type="text" id="preset-name" placeholder="E.g.- 'my preset'"/><br/>
-						<br/>
-						<button class='btn' id='save-as-ok'>OK</button>
-						<button class='btn' id='save-as-cancel'>Cancel</button>
-						<br/>
+          <!-- parameter selection tab -->
+          <div id="graph-selection" class="tab-pane fade">
 
-						</form>
-						</div>
+            <!-- inner tab headers -->
+            <ul class="nav nav-pills">
+              <li><a data-toggle="pill" href="#create-new">Create New</a></li>
+              <li><a data-toggle="pill" href="#load-preset">Load Preset</a></li>
+            </ul>
 
-						<!-- inner tab - load an existing model -->
-						<div id='load-preset' class="tab-pane fade">
-							<button id='reload-preset' class='btn' title="reload preset list">
-								<i class="glyphicon glyphicon-refresh white"></i>
-							</button>
-							<form action="" id='saved-presets'>
-								<div id="saved-preset-selection">
-									<select id='preset-list' size='10' class='form-control'>
-										
-									</select>
-								</div>
-								<button class='btn disabled' id='select-preset'>Load</button>
-								<button class='btn disabled' id='delete-preset'>Delete</button>
-							</form>
-						</div>
-						</div>
-					</div>
-					
-					<!-- graph display tab -->
-					<div id="graph-display" class="tab-pane fade">
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
- </body>
+            <div class="tab-content">
+              <!-- inner tab - create a new model -->
+              <div id="create-new" class="tab-pane fade">
+                <form action="" id='models-form'>
+                  <div id="model-selection">
+                    <button id='reload-plugins' class='btn' title="reload plugin list">
+                      <i class="glyphicon glyphicon-refresh white"></i>
+                    </button>
+                    <p>Select graph model:</p>
+                    <!-- model selection -->
+                    <ul id='model-list'>
+
+                    </ul>
+                  </div>
+                </form>
+                <hr>
+                <form action="" id='parameters-form'>
+                  <div id="parameter-selection">
+                  </div>
+                  <button class='btn disabled' id='param-select'>OK</button>
+                  <button class='btn disabled' id='save-preset'>Save</button>
+                </form>
+              </div>
+
+              <!-- hidden div - save preset popup -->
+              <div id='save-as-wrapper'>
+                <div id="save-as-background">
+                </div>
+                <form id="save-as-preset-form">
+                  <p>Enter preset name:</p><br>
+                  <input type="text" id="preset-name" placeholder="E.g.- 'my preset'" /><br/>
+                  <br/>
+                  <button class='btn' id='save-as-ok'>OK</button>
+                  <button class='btn' id='save-as-cancel'>Cancel</button>
+                  <br/>
+
+                </form>
+              </div>
+
+              <!-- inner tab - load an existing model -->
+              <div id='load-preset' class="tab-pane fade">
+                <button id='reload-preset' class='btn' title="reload preset list">
+                  <i class="glyphicon glyphicon-refresh white"></i>
+                </button>
+                <form action="" id='saved-presets'>
+                  <div id="saved-preset-selection">
+                    <select id='preset-list' size='10' class='form-control'></select>
+                  </div>
+                  <button class='btn disabled' id='select-preset'>Load</button>
+                  <button class='btn disabled' id='delete-preset'>Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- graph display tab -->
+          <div id="graph-display" class="tab-pane fade">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
 </html>
