@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from os import listdir, walk, environ
+from os import listdir, walk, environ, sep
 from os.path import join, basename#, dirname, isfile, isdir, abspath
 #from os import chdir
 from json import dumps
@@ -18,6 +18,8 @@ def getSubtree(current_path = []):
     if current_path == [] or current_path == '':
         path_to_list = root_dir
     else:
+        if sep == '/': #add initial / in unix based systems
+            current_path.insert(0, sep)
         path_to_list = join(*current_path)
     #print '-D- ' + path_to_list
     '''if current_path == root_dir:
