@@ -126,7 +126,7 @@ def loadpreset():
     """
     res = {}
     columns = request.get_json(force=True)
-    conn = sqlite3.connect('internals.db')
+    conn = sqlite3.connect('internals.DB')
     frame = pd.read_sql_query('select * from presets order by name', conn)
     conn.close()
     if type(columns) == list and len(columns) == 1 and columns[0] == 'all':
