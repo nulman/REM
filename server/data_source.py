@@ -14,7 +14,7 @@ from os import stat, remove
 from json import dumps
 #import GraphPlugins
 
-class datasource(object):
+class Datasource(object):
     '''
     parses an experiment file into an sql table,
     or set path to the correct database if this is a previously parsed experiment
@@ -208,7 +208,7 @@ if __name__ == '__main__':
     exp_file = 'experiments\\exp1\\exp-plotter'
     path_to_file = join(root_dir,exp_file)
     print 'base={} dirname={}'.format(basename(path_to_file), dirname(path_to_file))
-    data = datasource(join(root_dir,exp_file))
+    data = Datasource(join(root_dir,exp_file))
     data.plot('timestamp','performance',['vm-1'])
     #data.analyze()
     #print data.machines

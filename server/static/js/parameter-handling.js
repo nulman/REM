@@ -1,3 +1,4 @@
+// Author: Hadas Shahar <hshaha05@campus.haifa.ac.il>
 ///////////holds all the Graph Generation functions///////////////////////
 
 //global variables

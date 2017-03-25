@@ -3,3 +3,6 @@ server/experiments/6G/exp-plotter
 server/experiments/5G/exp-plotter
 server/experiments/7G/exp-plotter
 *.pyc
+server/static/bokeh/*
+!server/static/bokeh/.gitkeep
+server/static/bokeh/exp-plotter_Line_performance_timestamp_div.html

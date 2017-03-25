@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 server config file
-"""
+'''
 from os.path import abspath, dirname, join
 
 

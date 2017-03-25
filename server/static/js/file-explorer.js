@@ -1,4 +1,5 @@
-// holds all the file-explorer creation and update functions
+// Author: Hadas Shahar <hshaha05@campus.haifa.ac.il>
+////////// holds all the file-explorer creation and update functions ////////
 
 
 var currDir;                //holds the current directory- a list of folders
@@ -27,6 +28,7 @@ $(document).ready(function() {
    	callListdir(url,updateTree);
    }else{
    	  //do nothing - file is selected
+      //ii we want to change the behaviour to send to the server on dblclick instead of 'ok'
    }
   });
 
@@ -99,6 +101,7 @@ function isValid(node){
 function updateTree(data){
   $('#jstree').jstree(true).settings.core.data = data.json;
   $('#jstree').jstree(true).refresh();
+  $('#curr-dir').innerHTML = currDir;
 }
 
 //draws the initial tree with the data received from the server - called once
@@ -134,6 +137,7 @@ function drawTree(data){
       });
   //init currdir with directory of the first node
   currDir = data.url;
+  $('#curr-dir').innerHTML = currDir;
 }
 
 //fixes the height 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 @author: anulman
 
 this script takes exactly one (optional) parameter the FULL path to the experiments folder
-"""
+'''
 
 import os
 from sys import modules, argv
@@ -36,8 +36,8 @@ if app.config.has_key('experiment_root_dir'):
     os.environ['experiment_root_dir'] = app.config['experiment_root_dir']
 else:
     os.environ['experiment_root_dir'] = join(dirname(abspath(__file__)), 'experiments')
-from datasource import datasource
-from DirectoryListing import getSubtree
+from data_source import Datasource
+from directory_listing import getSubtree
 
 data = ''
 last_reload = 0.0
@@ -75,7 +75,7 @@ def listdir():
         if requested_path[0].endswith(':'):
             requested_path.insert(1,os.sep)
     #print "-D- requested_path: {}".format(requested_path)
-##    requested_path = requested_path.replace('#','')
+##    requested_path = requested_path.replace('#','') #this was a fix for get requests, leaving it in temporeraly
     #print "-D- id: {}".format(requested_path)
     res = getSubtree(requested_path)
     return Response(res, mimetype='application/json')
@@ -112,7 +112,7 @@ def listcols():
     requested_path = requested_path.replace('#','')
 #    print "-D- experiment: {}".format(requested_path)
     try:
-        data = datasource(requested_path)
+        data = Datasource(requested_path)
     except SyntaxError as e:
         abort(500, description="malformed experiment file\n"+str(e))
     #data.getcol()
@@ -121,11 +121,11 @@ def listcols():
 
 @app.route('/load',methods=['POST'])
 def loadpreset():
-    """
+    '''
     returns presets depending on the requested value:
     ["all"] - will return all presets in the database
     [] - will return presets that can apply to the selected experiment file
-    """
+    '''
     res = {}
     columns = request.get_json(force=True)
     conn = sqlite3.connect('internals.DB')
@@ -156,13 +156,13 @@ def loadpreset():
     
 @app.route('/save',methods=['POST'])
 def savepreset():
-    """
+    '''
     recieves a {'name':name, "preset": preset} dict
     where name is an arbitrary name for the preset (will overwrite presets with he same name)
     and preset is the the same as a graphplugin.getparameters
     example:
     {"name":"thing2","preset":{"Line":{"x_axis":"timestamp","y_axis":"performance","group_by":["vm-1","vm-2"]}}}
-    """
+    '''
     parameters = request.get_json()
     if type(parameters) != dict:
         abort(403, description="i was expecting a dict and instead i got a"+type(parameters))
@@ -198,11 +198,11 @@ def savepreset():
 
 @app.route('/delete',methods=['POST'])
 def deletepreset():
-    """
+    '''
     takes a list of names and deletes the associated presets if any
     example:
     ["name1","name2"]
-    """
+    '''
     parameters = request.get_json()
 #    print request
 #    print parameters
@@ -234,11 +234,11 @@ def plot():
     
     
 def module_reloader():
-    """since this application is threaded each thread needs to reload the plugins individually
+    '''since this application is threaded each thread needs to reload the plugins individually
     this is achieved by "touching" a file and any thread that hasnt reloaded the module
     will see that its saved timestamp is different from the file and will reload the module
     and update its internal timestamp to match the file
-    """
+    '''
     global last_reload
     last_reload_tester = os.path.join(os.path.dirname(__file__), 'reloader')
     mtime = os.stat(last_reload_tester).st_mtime
@@ -259,7 +259,7 @@ try:
 #        port = 5000 #while developing use a static port
         print "-I- starting server on port {}".format(app.config['port'])
 #        sock.close()
-        app.run(host = '0.0.0.0', port = app.config['port'], threaded=True)
+        app.run(app.config['hostname'], port = app.config['port'], threaded=True)
 except KeyboardInterrupt:
     print 'alas poor yorrick..'
     exit
