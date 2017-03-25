@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-
+'''
+@author: Alex Nulman <anulman@cs.haifa.ac.il>
+'''
 
 import pandas as pd
 import numpy as np
@@ -9,7 +11,7 @@ from collections import MutableMapping
 from bokeh.plotting import figure, output_file, show, ColumnDataSource
 from bokeh.embed import notebook_div,components
 from bokeh.io import save
-from os.path import basename, join, dirname, isfile
+from os.path import basename, join as join_path, dirname, isfile
 from os import stat, remove
 from json import dumps
 #import GraphPlugins
@@ -54,22 +56,20 @@ class Datasource(object):
                     raise Exception('test file timestamp changed!')
                 else: #nothing changed since lst scan
 #                    print '-D- old, unchanged file'
-                    self.getcol()
+                    self.generate_cols()
                     return
-        except sqlite3.OperationalError as e:
-            print e
-            conn.close()
-            remove(self.sqlpath)
         except Exception as e:
             print e
             remove(self.sqlpath)
+        finally:
+            conn.close()
         #parse experiment file and get column names
         self.analyze(start_pos)
-        self.getcol()
+        self.generate_cols()
                 
             
         
-    def getcol(self):
+    def generate_cols(self):
         '''returns the column names and the names of the vms (vm-1. vm-2 ...)'''
         conn = sqlite3.connect(self.sqlpath)
         self.columns = pd.read_sql_query("select * from columns", conn)['0'].tolist()
@@ -114,7 +114,8 @@ class Datasource(object):
                         del dic[entry]
                     #if entry == 'cache_alloc':
                         #print type(dic[entry])
-                dictlist.append(dic)
+                if len(dic.keys()) > 3:
+                    dictlist.append(dic)
         
         #turn data into a dataFrame and delete middle stage
         frame = pd.DataFrame(dictlist)
@@ -132,83 +133,88 @@ class Datasource(object):
         except Exception as e:
             print e
             #print self.columns[12]
+        finally:
             conn.close()
         #self.dataframe = frame
         
-        
-    def plot(self, x, y, machines):
-        '''
-        deprecated and no longer used.
-        left behind in case its required as referance, will be removed in the final product
-        '''
-        if type(machines) in [str, unicode]:
-            machines = [machines]
-        print "-D- x:|{}| y:|{}| machines:|{}|".format(x,y,machines)
-        print type(machines)
-        #frame = self.dataframe
-        #print frame
-        figure_name = 'line'
-        colors = ['blue', 'red', 'green', 'pink', 'orange']
-        parameters = []
-        for machine in machines:
-            print "-D- machine:|{}|".format(machines)
-            parameters.append({'machine':machine, 'x':x, 'y':y, 'color':colors.pop(0)}) # , 'color':'red'
-        fig = figure(title=figure_name,sizing_mode='stretch_both', x_axis_label=x ,y_axis_label=y ,tools=['hover','crosshair','wheel_zoom','box_zoom','pan','save','resize','reset'])
-        conn = sqlite3.connect(self.sqlpath)
-        try:
-            for params in parameters:
-            #take only rows that contain these columns
-                
-                frame_slice = pd.read_sql_query("select `{x}`,`{y}`,`name` from data where `{x}` != '' and `{y}` != '' and `name` = '{machine}' order by `{x}` asc".format(**params), conn)
-                #print frame_slice 
-                #return
-                #frame_slice = frame[frame[params['y']] > 0.0]
-                #frame_slice = frame_slice[frame_slice[params['x']] > 0.0]
-                #frame_slice = frame_slice[frame_slice.name == params['machine']][[params['x'], params['y']]]
-                #print frame_slice
-                fig.line(source=ColumnDataSource(frame_slice), x=params['x'],y=params['y'], line_width=2, legend=params['machine'], color=params['color'])
-        except 'asd' as e:
-            print e
-            conn.close()
-        conn.close()
-        name = '{}_{}_{}'.format(self.filename,x,y)
-        name = name.replace(':','')
-        output_file('static\\'+name+'.html', title=name, autosave=False, mode='cdn', root_dir=None)
-        save(fig)
-        js,div =components(fig, wrap_script = False, wrap_plot_info = True)
-        div_path = join('bokeh','{}_div.html'.format(name))
-        with open (join('static',div_path), 'w') as out:
-            out.write(div)
-        js_path = join('bokeh','{}_js.js'.format(name))
-        with open (join('static', js_path), 'w') as out:
-            out.write(js)
-        if __name__ == '__main__':
-            show(fig)
-        return {'div':div, 'js':js_path}
-'''        
-    #set parameters for the lines
-    figure_name = 'line'
-    parameters = []
-    parameters.append({'machine':'vm-1', 'x':'timestamp', 'y':'cache_and_buff', 'color':'red'})
-    parameters.append({'machine':'vm-1', 'x':'timestamp', 'y':'mem_unused', 'color':'blue'})
-    
-    fig = figure(title=figure_name,tools=['hover','crosshair','wheel_zoom','box_zoom','pan','save','resize','reset'])
-    for params in parameters:
-        #take only rows that contain these columns
-        frame_slice = frame[frame[params['y']] > 0.0]
-        frame_slice = frame_slice[frame_slice[params['x']] > 0.0]
-        frame_slice = frame_slice[frame_slice.name == params['machine']][[params['x'], params['y']]]
-        fig.line(source=ColumnDataSource(frame_slice), x=params['x'],y=params['y'], line_width=4, legend=params['y'], color=params['color'])
-    
-    
-    js,div =components(fig, wrap_script = True, wrap_plot_info = True)
-'''
+#==============================================================================
+#         
+#     def plot(self, x, y, machines):
+#         '''
+#         deprecated and no longer used.
+#         left behind in case its required as referance, will be removed in the final product
+#         '''
+#         if type(machines) in [str, unicode]:
+#             machines = [machines]
+#         print "-D- x:|{}| y:|{}| machines:|{}|".format(x,y,machines)
+#         print type(machines)
+#         #frame = self.dataframe
+#         #print frame
+#         figure_name = 'line'
+#         colors = ['blue', 'red', 'green', 'pink', 'orange']
+#         parameters = []
+#         for machine in machines:
+#             print "-D- machine:|{}|".format(machines)
+#             parameters.append({'machine':machine, 'x':x, 'y':y, 
+#                                'color':colors.pop(0)}) # , 'color':'red'
+#         fig = figure(title=figure_name,sizing_mode='stretch_both', 
+#                      x_axis_label=x ,y_axis_label=y ,tools=['hover','crosshair','wheel_zoom','box_zoom','pan','save','resize','reset'])
+#         conn = sqlite3.connect(self.sqlpath)
+#         try:
+#             for params in parameters:
+#             #take only rows that contain these columns
+#                 
+#                 frame_slice = pd.read_sql_query("select `{x}`,`{y}`,`name` from data where `{x}` != '' and `{y}` != '' and `name` = '{machine}' order by `{x}` asc".format(**params), conn)
+#                 #print frame_slice 
+#                 #return
+#                 #frame_slice = frame[frame[params['y']] > 0.0]
+#                 #frame_slice = frame_slice[frame_slice[params['x']] > 0.0]
+#                 #frame_slice = frame_slice[frame_slice.name == params['machine']][[params['x'], params['y']]]
+#                 #print frame_slice
+#                 fig.line(source=ColumnDataSource(frame_slice), x=params['x'],
+#                          y=params['y'], line_width=2, legend=params['machine'], color=params['color'])
+#         finally:
+#             conn.close()
+#         name = '{}_{}_{}'.format(self.filename,x,y)
+#         name = name.replace(':','')
+#         output_file('static\\'+name+'.html', title=name, autosave=False, 
+#                     mode='cdn', root_dir=None)
+#         save(fig)
+#         js,div =components(fig, wrap_script = False, wrap_plot_info = True)
+#         div_path = join_path('bokeh','{}_div.html'.format(name))
+#         with open (join_path('static',div_path), 'w') as out:
+#             out.write(div)
+#         js_path = join_path('bokeh','{}_js.js'.format(name))
+#         with open (join_path('static', js_path), 'w') as out:
+#             out.write(js)
+#         if __name__ == '__main__':
+#             show(fig)
+#         return {'div':div, 'js':js_path}
+# '''        
+#     #set parameters for the lines
+#     figure_name = 'line'
+#     parameters = []
+#     parameters.append({'machine':'vm-1', 'x':'timestamp', 'y':'cache_and_buff', 'color':'red'})
+#     parameters.append({'machine':'vm-1', 'x':'timestamp', 'y':'mem_unused', 'color':'blue'})
+#     
+#     fig = figure(title=figure_name,tools=['hover','crosshair','wheel_zoom','box_zoom','pan','save','resize','reset'])
+#     for params in parameters:
+#         #take only rows that contain these columns
+#         frame_slice = frame[frame[params['y']] > 0.0]
+#         frame_slice = frame_slice[frame_slice[params['x']] > 0.0]
+#         frame_slice = frame_slice[frame_slice.name == params['machine']][[params['x'], params['y']]]
+#         fig.line(source=ColumnDataSource(frame_slice), x=params['x'],y=params['y'], line_width=4, legend=params['y'], color=params['color'])
+#     
+#     
+#     js,div =components(fig, wrap_script = True, wrap_plot_info = True)
+# '''
+#==============================================================================
 if __name__ == '__main__':
     root_dir = 'Z:\\GIT\\REM\\server'
     exp_file = 'experiments\\exp1\\exp-plotter'
-    path_to_file = join(root_dir,exp_file)
+    path_to_file = join_path(root_dir,exp_file)
     print 'base={} dirname={}'.format(basename(path_to_file), dirname(path_to_file))
-    data = Datasource(join(root_dir,exp_file))
+    data = Datasource(join_path(root_dir,exp_file))
     data.plot('timestamp','performance',['vm-1'])
     #data.analyze()
     #print data.machines

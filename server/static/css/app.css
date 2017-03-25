@@ -216,3 +216,7 @@ input{
 #preset-list{
 	resize:both;
 }
+
+#curr-dir{
+	padding: 3px;
+}

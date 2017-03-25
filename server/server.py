@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
-@author: anulman
+@author: Alex Nulman <anulman@cs.haifa.ac.il>
 
-this script takes exactly one (optional) parameter the FULL path to the experiments folder
+this is teh main app, it takes no parameters, instead update config.py
 '''
 
 import os
@@ -15,7 +15,7 @@ from re import split
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, current_app, Response
 from json import dumps, loads
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, join as join_path
 import pandas as pd
 from config import config
 import GraphPlugins
@@ -35,9 +35,9 @@ app.config.update(config)
 if app.config.has_key('experiment_root_dir'):
     os.environ['experiment_root_dir'] = app.config['experiment_root_dir']
 else:
-    os.environ['experiment_root_dir'] = join(dirname(abspath(__file__)), 'experiments')
+    os.environ['experiment_root_dir'] = join_path(dirname(abspath(__file__)), 'experiments')
 from data_source import Datasource
-from directory_listing import getSubtree
+from directory_listing import get_subtree
 
 data = ''
 last_reload = 0.0
@@ -46,7 +46,7 @@ last_reload = 0.0
 #def login():
 #    session['logged_in'] = True
 #    flash('You were logged in')
-#    return redirect(os.path.join('static', 'index.html'))
+#    return redirect(os.path.join_path('static', 'index.html'))
 
 @app.route('/',methods=['GET', 'POST'])
 def main_page():
@@ -57,10 +57,10 @@ def main_page():
         print request.form
     else:
         print "{} {}".format(request.method, type(request.method))
-    return redirect(os.path.join('static', 'index.html'))
+    return redirect(join_path('static', 'index.html'))
     
 @app.route('/listdir',methods=['POST'])
-def listdir():
+def list_dir():
     '''
     generates subtrees for the file browser
     '''
@@ -77,17 +77,17 @@ def listdir():
     #print "-D- requested_path: {}".format(requested_path)
 ##    requested_path = requested_path.replace('#','') #this was a fix for get requests, leaving it in temporeraly
     #print "-D- id: {}".format(requested_path)
-    res = getSubtree(requested_path)
+    res = get_subtree(requested_path)
     return Response(res, mimetype='application/json')
 
 @app.route('/reloadplugin',methods=['GET', 'POST'])
-def reloadplugin():
+def reload_plugin():
     '''reloads the plugins'''
-    path(os.path.join(os.path.dirname(__file__), 'reloader')).touch()
+    path(join_path(dirname(__file__), 'reloader')).touch()
     #os.remove(os.path.abspath(GraphPlugins.__file__))
     for item in os.listdir(os.path.dirname(GraphPlugins.__file__)):
         if str(item).endswith('.pyc'):
-            os.remove( os.path.join(os.path.dirname(GraphPlugins.__file__),item))
+            os.remove( join_path(dirname(GraphPlugins.__file__),item))
     for item in [x for x in modules.keys() if x.startswith("GraphPlugins.")]:
         del modules[item]
     reload(GraphPlugins)
@@ -95,7 +95,7 @@ def reloadplugin():
 
 
 @app.route('/getcolumns',methods=['GET'])
-def listcols():
+def list_cols():
     '''
     initialized the experiment data object and parses the experiment file if required
     returns the column names in the experiment and the graph plugins
@@ -109,18 +109,20 @@ def listcols():
 #    print "-D- experiment: {}".format(request.args.get('experiment'))
     requested_path = request.args.get('experiment')
 #    print "-D- experiment: {}".format(requested_path)
+# the pount symbol occasionally get appended to the line,
+# i want to make sure it gets removed.
     requested_path = requested_path.replace('#','')
 #    print "-D- experiment: {}".format(requested_path)
     try:
         data = Datasource(requested_path)
     except SyntaxError as e:
         abort(500, description="malformed experiment file\n"+str(e))
-    #data.getcol()
+    #data.generate_cols()
     res = {'cols':data.columns, 'name':data.machines, 'models':GraphPlugins.graphtypes}
     return Response(dumps(res), mimetype='application/json')
 
 @app.route('/load',methods=['POST'])
-def loadpreset():
+def load_preset():
     '''
     returns presets depending on the requested value:
     ["all"] - will return all presets in the database
@@ -155,7 +157,7 @@ def loadpreset():
 
     
 @app.route('/save',methods=['POST'])
-def savepreset():
+def save_preset():
     '''
     recieves a {'name':name, "preset": preset} dict
     where name is an arbitrary name for the preset (will overwrite presets with he same name)
@@ -197,7 +199,7 @@ def savepreset():
     return Response(dumps(['Preset saved.']), mimetype='application/json')
 
 @app.route('/delete',methods=['POST'])
-def deletepreset():
+def delete_preset():
     '''
     takes a list of names and deletes the associated presets if any
     example:
@@ -240,7 +242,7 @@ def module_reloader():
     and update its internal timestamp to match the file
     '''
     global last_reload
-    last_reload_tester = os.path.join(os.path.dirname(__file__), 'reloader')
+    last_reload_tester = join_path(dirname(__file__), 'reloader')
     mtime = os.stat(last_reload_tester).st_mtime
     if mtime != last_reload:
         print "reloading! mtime was {} and is now {}".format(str(last_reload), str(mtime))

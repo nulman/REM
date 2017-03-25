@@ -1,7 +1,11 @@
-from os.path import dirname, basename, isfile, join
+'''
+@author: Alex Nulman <anulman@cs.haifa.ac.il>
+'''
+
+from os.path import dirname, basename, isfile, join as join_path
 import glob
 
-modules = glob.glob(join(dirname(__file__),"*.py"))
+modules = glob.glob(join_path(dirname(__file__),"*.py"))
 __all__ = [ basename(f)[:-3] for f in modules if isfile(f)]
 del glob, dirname, basename, isfile, modules
 __all__.remove('__init__')

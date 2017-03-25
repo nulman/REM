@@ -63,7 +63,7 @@ function sendExperimentToServer(){
       //get parameter list from the server, and fill parameters list
       url = "/getcolumns?experiment="+id;
       $('#loader').show();
-
+      console.log("sending experiment to the server, awaiting response")
       //send to server
       $.ajax({
         url: url,
@@ -101,7 +101,7 @@ function isValid(node){
 function updateTree(data){
   $('#jstree').jstree(true).settings.core.data = data.json;
   $('#jstree').jstree(true).refresh();
-  $('#curr-dir').innerHTML = currDir;
+  $('#curr-dir').html(currDir);
 }
 
 //draws the initial tree with the data received from the server - called once
@@ -137,7 +137,7 @@ function drawTree(data){
       });
   //init currdir with directory of the first node
   currDir = data.url;
-  $('#curr-dir').innerHTML = currDir;
+  $('#curr-dir').html(currDir);
 }
 
 //fixes the height 

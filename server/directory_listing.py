@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-
+'''
+@author: Alex Nulman <anulman@cs.haifa.ac.il>
+'''
 
 from os import listdir, walk, environ, sep
-from os.path import join, basename#, dirname, isfile, isdir, abspath
+from os.path import join as join_path, basename#, dirname, isfile, isdir, abspath
 #from os import chdir
 from json import dumps
 #from flask import Flask, app
@@ -10,7 +12,7 @@ root_dir = environ['experiment_root_dir']
 #root_dir = dirname(abspath(__file__))
 root_name = basename(root_dir)
 
-def getSubtree(current_path = []):
+def get_subtree(current_path = []):
     '''
     generates file/folder subtrees for the file walker
     '''
@@ -20,7 +22,7 @@ def getSubtree(current_path = []):
     else:
         if sep == '/': #add initial / in unix based systems
             current_path.insert(0, sep)
-        path_to_list = join(*current_path)
+        path_to_list = join_path(*current_path)
     #print '-D- ' + path_to_list
     '''if current_path == root_dir:
         json_string = [{'text':root_name ,'children':json_string, 
@@ -32,8 +34,8 @@ def getSubtree(current_path = []):
             #print d
             item = {}
             item['text'] = d
-            item['children'] = True if listdir(join(path_to_list,d)) else False
-            item['id'] = join(path_to_list, d)
+            item['children'] = True if listdir(join_path(path_to_list,d)) else False
+            item['id'] = join_path(path_to_list, d)
             item['icon'] = 'glyphicon glyphicon-folder-open'
             item['type'] = 'default'
             item['state'] = {'opened':False}
@@ -51,7 +53,7 @@ def getSubtree(current_path = []):
             item['text'] = f
             item['children'] = False
             item['icon'] = 'glyphicon glyphicon-file'
-            item['id'] = join(path_to_list, f)
+            item['id'] = join_path(path_to_list, f)
             item['type'] = 'file'
             json_string.append(item)
         break #we only want one layer of listing
@@ -60,4 +62,4 @@ def getSubtree(current_path = []):
     return dumps(json_string)
 
 if __name__ == '__main__':            
-    print getSubtree()
+    print get_subtree()
