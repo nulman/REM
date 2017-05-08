@@ -1,8 +1,5 @@
 /*Author: Hadas Shahar <hshaha05@campus.haifa.ac.il>*/
 /*whole page definitions*/
-.row, .container-fluid{
-	margin: 0;
-}
 
 .form-group.row{
 	margin: 5px;
@@ -20,10 +17,9 @@ html,body{
 }
 
 .container-fluid.main{
-	//background-color: rgba(0, 0, 0, 0.7);
 	color:white;
     //overflow-y: hidden;
-    
+    width:100%;
 }
 
 .btn{
@@ -41,6 +37,7 @@ html,body{
 .nav-pills li a{
 	background-color: black;
 	color: white;
+	margin: 5px;
 }
 
 .nav-pills li a:hover{
@@ -58,9 +55,12 @@ html,body{
 
 #logo{
 	width: auto;
-	height: 95%;
+	height: 90%;
 	float: left;
 	margin: 5px;
+}
+#logo:hover{
+	cursor:pointer;
 }
 
 h1{
@@ -81,6 +81,20 @@ h1{
 
 #proj-select{
 	float: right;
+}
+
+#explorer-wrapper{
+	padding-left: 0;
+}
+
+#curr-dir{
+	padding: 7px;
+	background-color: #505050;
+}
+
+#selected-exp{
+	padding: 7px;
+	background-color: #3db1c8;
 }
 
 /*parameter selection definitions*/
@@ -118,11 +132,6 @@ select,datalist{
 .nav-pills > li.active > a:focus {
     background-color:#3db1c8;
 }
-
-.nav-pills > li{
-	margin: 5px;
-}
-
 
 .loader {
     border: 16px solid rgba(0,0,0,0.3); /* transparent*/
@@ -197,7 +206,7 @@ hr{
 	padding: 10px;
 	position: absolute;
 	top: 50%;
-	left: 50%;
+	left: 30%;
 	background-color: #262626;
 	border: 5px solid #3db1c8;
 }
@@ -213,10 +222,14 @@ input{
 	text-align: center;
 }
 
-#preset-list{
+#preset-list,select{
 	resize:both;
 }
 
-#curr-dir{
-	padding: 3px;
+footer{
+	width:100%;
+	position:fixed;
+	bottom:0;
+	background-color: #505050;
+	padding: 5px;
 }

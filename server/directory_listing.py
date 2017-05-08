@@ -4,12 +4,9 @@
 '''
 
 from os import listdir, walk, environ, sep
-from os.path import join as join_path, basename#, dirname, isfile, isdir, abspath
-#from os import chdir
+from os.path import join as join_path, basename
 from json import dumps
-#from flask import Flask, app
 root_dir = environ['experiment_root_dir']
-#root_dir = dirname(abspath(__file__))
 root_name = basename(root_dir)
 
 def get_subtree(current_path = []):
@@ -23,15 +20,8 @@ def get_subtree(current_path = []):
         if sep == '/': #add initial / in unix based systems
             current_path.insert(0, sep)
         path_to_list = join_path(*current_path)
-    #print '-D- ' + path_to_list
-    '''if current_path == root_dir:
-        json_string = [{'text':root_name ,'children':json_string, 
-                               'id':path_to_list,'icon':'glyphicon glyphicon-folder-open','type':'default','state':{'opened':False}}]
-    else:'''
     for _,dirs,files in walk(path_to_list):
-        #print 'dirs:'
         for d in dirs:
-            #print d
             item = {}
             item['text'] = d
             item['children'] = True if listdir(join_path(path_to_list,d)) else False
@@ -40,7 +30,6 @@ def get_subtree(current_path = []):
             item['type'] = 'default'
             item['state'] = {'opened':False}
             json_string.append(item)
-        #print 'files:'
         for f in files:
             try:
                 if str(f).endswith('.db'):
@@ -48,7 +37,6 @@ def get_subtree(current_path = []):
             except UnicodeEncodeError as e:
                 print e
                 continue
-            #print f
             item = {}
             item['text'] = f
             item['children'] = False
@@ -57,7 +45,6 @@ def get_subtree(current_path = []):
             item['type'] = 'file'
             json_string.append(item)
         break #we only want one layer of listing
-    #json_string = [json_string]
     json_string = {'json':json_string, 'url':root_dir}
     return dumps(json_string)
 

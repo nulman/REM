@@ -31,12 +31,15 @@ class template(object):
         '''
         
         params = OrderedDict()
-        params['x_axis'] = {'type':'single','source':'cols'}
-        params['y_axis'] = {'type':'single','source':'cols'}
-        params['group_by'] ={'type':'single','source':'name'}
-        return {'template':params}
+        params['x_axis'] = {'type':'single', 'filterByValue':False}
+        params['y_axis'] = {'type':'single', 'filterByValue':False}
+        params['group_by'] ={'type':'single', 'filterByValue':True}
+        #__name__ is GraphPlugins.template (the module name)  we just want the module name
+        return {__name__[__name__.index('.')+1:]:params}
         #example of how it could look
-        #return {'template': {'x-axis':'single', 'y-axis':'single', 'group-by':'multiple'}}
+        #return {'template': {'x-axis':{'type':'single', 'filterByValue':False}, 
+        #   'y-axis':{'type':'single', 'filterByValue':False}, 
+        #   'group-by':{'type':'single', 'filterByValue':True}}}
         
     def plot(self, filename, sqlpath, x_axis, y_axis, group_by):
         '''
@@ -48,35 +51,32 @@ class template(object):
         the return should be a dict {'div':div, 'js':js_path} 
         '''
         
-        parameters = {'group_by':group_by, 'x':x_axis, 'y':y_axis}
+        parameters = []
+        group_by, value = group_by.iteritems().next()
+        parameters = {'group_by':group_by, 'x':x_axis, 'y':y_axis, 'val':value}
         conn = sqlite3.connect(sqlpath)
         try:
-                frame_slice = pd.read_sql_query("select `{x}`,`{y}` from data where `{x}` != '' and `{y}` != '' and `name` = '{group_by}' order by `{x}` asc".format(**parameters), conn)
-                #frame_slice = pd.read_sql_query("select `timestamp`,`performance` from data where `timestamp` != '' and `performance` != '' and `name` = 'vm-1' order by `timestamp` asc", conn)
+                query = "select `{x}`,`{y}` from data where `{x}` != '' and `{y}` != '' and `{group_by}` = '{val}' order by `{x}` asc".format(**parameters)
+                frame_slice = pd.read_sql_query(query.format(**parameters), conn)
+                #e.x: frame_slice = pd.read_sql_query("select `timestamp`,`performance` from data where `timestamp` != '' and `performance` != '' and `name` = 'vm-1' order by `timestamp` asc", conn)
 
         except Exception as e:
             print e
             conn.close()
         conn.close()
         #graph generation
-        fig = charts.Step(data=frame_slice, x=x_axis, y=y_axis)
+        fig = charts.Step(data=frame_slice, x='{}'.format(x_axis), y='{}'.format(y_axis))
         #fig = charts.Step(data=frame_slice, x='timestamp', y='performance', legend=True, tools=['hover','crosshair','wheel_zoom','box_zoom','pan','save','resize','reset'])
         
         #if your graph object is named 'fig' you can copy the following code as is
         #omit the lines up to the next comment if you do not want to save the graph as an html to disk
         name = '{}_{}_{}_{}'.format(filename,self.getparameters().keys()[0],x_axis,y_axis)
         name = name.replace(':','')
+        #this generates an html of the graph if you dont want to generate it every time
         charts.output_file(join('static', name+'.html'), title=name, mode='cdn', root_dir=None)
         save(fig)
         #this is where the graph is broken into embeddable components
         js,div =components(fig, wrap_script = False, wrap_plot_info = True)
-#        div_path = join('bokeh','{}_div.html'.format(name))
-#        with open (join('static',div_path), 'w') as out:
-#            out.write(div)
-        #the js component must be saved to disk
-        js_path = join('bokeh','{}_js.js'.format(name))
-        with open (join('static', js_path), 'w') as out:
-            out.write(js)
-        return {'div':div, 'js':js_path}
+        return {'div':div, 'js':js}
         
     

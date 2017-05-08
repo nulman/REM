@@ -38,6 +38,8 @@
       <!-- file explorer -->
       <div id="explorer-wrapper" class="col-md-3">
         <div id="file-explorer">
+          <!-- display the currently selected experiment -->
+          <p id='selected-exp'></p>
           <!-- display the current directory -->
           <p id='curr-dir'></p>
           <!-- up directory button -->
@@ -66,7 +68,7 @@
         <!-- tab contents -->
 
         <!-- hidden divs - errors info and loaders -->
-        <div id="err-msg">Server error</div>
+        <div id="err-msg">error- check the console log</div>
         <div id='loader' class="loader"></div>
         <div id='server-success'></div>
 
@@ -120,6 +122,7 @@
 
                 </form>
               </div>
+              <!-- end of save preset popup -->
 
               <!-- inner tab - load an existing model -->
               <div id='load-preset' class="tab-pane fade">
@@ -142,6 +145,11 @@
           </div>
         </div>
       </div>
+
+	<footer id='notification'>
+		Application loaded
+	</footer>
+
     </div>
   </div>
 </body>

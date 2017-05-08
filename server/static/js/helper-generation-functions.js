@@ -1,4 +1,4 @@
-
+// Author: Hadas Shahar <hshaha05@campus.haifa.ac.il>
 //////////////////////generation helper functions//////////////////////////
 //generates an input
 function generateInput(inputType){
@@ -17,7 +17,7 @@ function generateLabel(forName,className,value){
 }
 
 //generates the required input element (datalist,select,radio button,checkbox or range)
-function generateInputField(id,type,parameters){
+function generateInputField(id,type,parameters,wrap=true){
   var newInput;
 
   switch(type){
@@ -39,8 +39,10 @@ function generateInputField(id,type,parameters){
       //add handling
       break;
   }
-
-  newInput = wrapInDiv(newInput, 'col-xs-10');
+  //if wrap is true- wrap the input in a div (looks more unified)
+  if(wrap){
+    newInput = wrapInDiv(newInput, 'col-xs-10');
+  }
   return newInput;
 }
 

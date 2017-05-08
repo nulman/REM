@@ -22,9 +22,9 @@ class Heat(object):
     def getparameters(self):
         #return {'Line': {'x-axis':'single', 'y-axis':'single', 'group-by':'multiple'}}
         params = OrderedDict()
-        params['x_axis'] = {'type':'single','source':'cols'}
-        params['y_axis'] = {'type':'single','source':'cols'}
-        params['group_by'] ={'type':'multiple','source':'name'}
+        params['x_axis'] = {'type':'single', 'filterByValue':False}
+        params['y_axis'] = {'type':'single', 'filterByValue':False}
+        params['group_by'] ={'type':'multiple', 'filterByValue':True}
         return {'Heat':params}
         
     def plot(self, filename, sqlpath, x_axis, y_axis, group_by):
@@ -37,15 +37,7 @@ class Heat(object):
         charts.output_file(join_path('static', name+'.html'), title=name, mode='cdn', root_dir=None)
         save(fig)
         js,div =components(fig, wrap_script = False, wrap_plot_info = True)
-        div_path = join_path('bokeh','{}_div.html'.format(name))
-        with open (join_path('static',div_path), 'w') as out:
-            out.write(div)
-        js_path = join_path('bokeh','{}_js.js'.format(name))
-        with open (join_path('static', js_path), 'w') as out:
-            out.write(js)
-#        if __name__ == '__main__':
-#            show(fig)
-        return {'div':div, 'js':js_path}
+        return {'div':div, 'js':js}
 
 
 
