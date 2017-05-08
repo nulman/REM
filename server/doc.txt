@@ -1,7 +1,0 @@
-the server uses several custom imports:
-	datasource:
-		a class that handles parsing experiment files into sqlite, including updating and column fetching
-	GraphPlugins:
-		a package that dynamically loads all submodules in its dir as graph models - this is the graph plugin system
-	DirectoryListing:
-		single function - handles file browser operations.
