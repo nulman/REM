@@ -5,4 +5,6 @@ server/experiments/7G/exp-plotter
 *.pyc
 server/static/bokeh/*
 !server/static/bokeh/.gitkeep
-server/static/bokeh/exp-plotter_Line_performance_timestamp_div.html
+!server/static/index.html
+server/static/*.html
+exmple-data/*.db

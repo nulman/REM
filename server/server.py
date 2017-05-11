@@ -28,7 +28,7 @@ app.config.update(config)
 if app.config.has_key('experiment_root_dir'):
     os.environ['experiment_root_dir'] = app.config['experiment_root_dir']
 else:
-    os.environ['experiment_root_dir'] = join_path(dirname(abspath(__file__)), 'experiments')
+    os.environ['experiment_root_dir'] = dirname(abspath(__file__))
 from data_source import Datasource
 from directory_listing import get_subtree
 

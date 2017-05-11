@@ -1,18 +1,20 @@
-# -*- coding: utf-8 -*-
 '''
 @author: Alex Nulman <anulman@cs.haifa.ac.il>
 server config file
 '''
-from os.path import abspath, dirname, exists, join as join_path
+import os
 
-#experiments_root_dir is the initial directory to start the file browser in
-#it will default to the server location
-experiments_root_dir = dirname(abspath(__file__))
-if exists(join_path(experiments_root_dir, 'experiments')):
-    experiments_root_dir = join_path(experiments_root_dir, 'experiments')
+# data_dir is the initial directory to start the file browser in
+# it will default to the server location.
+data_root_dir = os.path.dirname(os.path.abspath(__file__))
+
+example_data_dir = os.path.join(data_root_dir, '../example-data')
+if example_data_dir:
+    data_root_dir = example_data_dir
+
 config = dict(
               port = 5000,
-              experiment_root_dir = experiments_root_dir,
+              experiment_root_dir = os.path.normpath(os.path.expanduser(data_root_dir)),
               debug = True,
               hostname = '0.0.0.0',
               #the SECRET_KEY is required, without it you cant have sessions.
