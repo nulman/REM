@@ -17,6 +17,9 @@ An interface for graph generation from given data file.
 - **Zoom/Pan**: Generated graphs are interactive in the browser, allowing zoom and pan.
 - **Portability**: Database files (SQLite) holds the models and presets, and can be moved between machines to retain models/presets information.
 
+# Documentation
+More information and the project documentation can be found in the repository Wiki.
+
 # Quick Install Guide
 Currently, **REM** supports only Ubuntu Server.
 
