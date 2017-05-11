@@ -7,4 +7,5 @@ server/static/bokeh/*
 !server/static/bokeh/.gitkeep
 !server/static/index.html
 server/static/*.html
-exmple-data/*.db
+example-data/*.db
+server/exports/*.json
