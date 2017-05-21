@@ -110,10 +110,11 @@ select,datalist{
 
 
 #err-msg{
-	color:red;
-	background-color: white;
+	color: red;
+	background-color: black;
 	padding: 10px;
 	margin: 10px;
+	white-space: pre-wrap;
 }
 
 .white, .white a {

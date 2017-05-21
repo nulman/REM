@@ -1,10 +1,13 @@
-// Author: Hadas Shahar <hshaha05@campus.haifa.ac.il>
+// @edited: Liran Funaro <funaro@cs.technion.ac.il>
+// @author: Hadas Shahar <hshaha05@campus.haifa.ac.il>
+
 ////////// holds all the file-explorer creation and update functions ////////
 
 ///global variables:
 
-var currDir;                //holds the current directory- a list of folders
-var patt = /\\[^\\]+$|\/[^\/]+$/; //regex pattern for truncating directory paths
+var curDir = "";                //holds the current directory- a list of folders
+var curDirList = [];
+var selectedFile = "";
 
 ///on document ready:
 
@@ -15,8 +18,9 @@ $(document).ready(function() {
   $('#selected-exp').hide();
 
   //get root directory and draw the initial file explorer tree
-  var empty = [];
-  callListdir(empty,drawTree);
+  initTree();
+  changeDir(curDirList);
+
   //fixes explorer height to fill whole screen
   maxHeight('#file-explorer');
 
@@ -39,26 +43,20 @@ $(document).ready(function() {
      var node = $('#jstree').jstree('get_selected',true);
      //if folder - update tree
      if(node[0].type == 'default'){
-     	var url = node[0].id;
-     	currDir = url;
-     	callListdir(url,updateTree);
+     	changeDir([node[0].id]);
      }else{
-     	  //do nothing - file is selected
-        // change here if we want to change the behaviour to send to the server 
-        // on dblclick instead of 'ok'
+        selectDataFile();
      }
   });
 
-  
   //handles file explorer 'up directory' button
   $('#up-dir').on('click',function(){
-    id = currDir.replace(patt, "");  
-    currDir = id;
-    callListdir(currDir,updateTree);
+    up_dir_list = curDirList.slice(0, -1);
+    changeDir(up_dir_list);
   });
 
   //handles project selection- 'OK' button
-  $('#proj-select').on('click', sendExperimentToServer);
+  $('#proj-select').on('click', selectDataFile);
 
   //toggles file explorer button
   $( "#toggle-explorer" ).click(function() {
@@ -76,107 +74,78 @@ $(document).ready(function() {
 
 ///functions:
 
-
+//sends the selected experiment path to the server to get the experiment parameters
+//upon success, moves to handleParameters which generates the corresponding UI
+function selectDataFile() {
+  //get the path of the project
+    var node = $('#jstree').jstree('get_selected',true)[0];
+    if(node.type != 'file') {
+        return
+    }
+    selectDataFileSequance(node.id);
+}
 
 //sends the selected experiment path to the server to get the experiment parameters
 //upon success, moves to handleParameters which generates the corresponding UI
-function sendExperimentToServer(){
-  //get the path of the project
-    var node = $('#jstree').jstree('get_selected',true);
-    var id = node[0].id;
-
-    $('#selected-exp').html(id);
+function selectDataFileSequance(path) {
+    selectedFile = path;
+    $('#selected-exp').html(selectedFile);
     $('#selected-exp').show();
 
-    //if selection is valid (not a folder)
-    if(isValid(node[0])){
-      //get parameter list from the server, and fill parameters list
-      $('#loader').show();
-      console.log("sending experiment to the server, awaiting response");
-      $("#notification").html("sending experiment to the server, awaiting response");
-      //clear the current model/parameters form
-      $('model-list').empty();
-      $('#parameter-selection').empty();
-      //send to server
-      $.ajax({
-        async: true,
-        type: "POST",
-        url: "/getcolumns",
-        contentType:'application/json',
-        data: JSON.stringify(id),
-        dataType : "json",   
-        success: handleParameters,
-        error: serverErrorHandler
-      });
-    }
+    //get parameter list from the server, and fill parameters list
+    $('#loader').show();
+    console.log("sending experiment to the server, awaiting response");
+    $("#notification").html("sending experiment to the server, awaiting response");
+    //clear the current model/parameters form
+
+    updateListPlugin()
+    updatePresetList()
 }
 
 
 //makes a request to the server to get the tree information with the given url
 //if the request was successful, the success function is then called
-function callListdir(data,successFunction){
-  $.ajax({
-        async : true,
-        type : "POST",
-        url : "/listdir",
-        contentType:'application/json',
-        data: JSON.stringify(data),
-        dataType : "json",    
-        success : successFunction      
-    });
+function changeDir(path_list) {
+  asyncListDir(path_list, function(data) {
+    //updates the tree with new data
+    curDirList = data.url_list;
+    curDir = data.url;
+    $('#jstree').jstree(true).settings.core.data = data.json;
+    $('#jstree').jstree(true).refresh();
+    $('#curr-dir').html(curDir);
+  });
 }
 
-//checks that the selected id is indeed a file-type
-function isValid(node){
-  if(node.type == 'file'){
-    return true;
-  }else{
-    return false;
-  }
+
+function initTree() {
+    $('#jstree').jstree({
+      'core' : {
+        'data' : [],
+        'themes' : {
+          "name": "default-dark",
+          //"dots": true,
+          "icons": true,
+          'responsive' : false,
+          //'variant' : 'small',
+          'stripes' : true
+        }
+      },
+      'sort' : function(a, b) {
+        return this.get_type(a) === this.get_type(b) ? (this.get_text(a) > this.get_text(b) ? 1 : -1) : (this.get_type(a) >= this.get_type(b) ? 1 : -1);
+      },
+      'types' : {
+        'default' : { 'icon' : 'glyphicon glyphicon-folder' },
+        'file' : { 'valid_children' : [], 'icon' : 'glyphicon glyphicon-file' }
+      },
+      'unique' : {
+        'duplicate' : function (name, counter) {
+          return name + ' ' + counter;
+        }
+      },
+      'plugins' : ['state','dnd','sort','types','unique','wholerow']
+    })
 }
 
-//updates the tree with new data
-function updateTree(data){
-  $('#jstree').jstree(true).settings.core.data = data.json;
-  $('#jstree').jstree(true).refresh();
-  $('#curr-dir').html(currDir);
-}
-
-//draws the initial tree with the data received from the server - called once
-function drawTree(data){
-  $(function() {
-      $('#jstree')
-        .jstree({
-          'core' : {
-            'data' : data.json,
-            'themes' : {
-              "name": "default-dark",
-              //"dots": true,
-              "icons": true,
-              'responsive' : false,
-              //'variant' : 'small',
-              'stripes' : true
-            }
-          },
-          'sort' : function(a, b) {
-            return this.get_type(a) === this.get_type(b) ? (this.get_text(a) > this.get_text(b) ? 1 : -1) : (this.get_type(a) >= this.get_type(b) ? 1 : -1);
-          },
-          'types' : {
-            'default' : { 'icon' : 'glyphicon glyphicon-folder' },
-            'file' : { 'valid_children' : [], 'icon' : 'glyphicon glyphicon-file' }
-          },
-          'unique' : {
-            'duplicate' : function (name, counter) {
-              return name + ' ' + counter;
-            }
-          },
-          'plugins' : ['state','dnd','sort','types','unique','wholerow']
-        })
-      });
-  //init currdir with directory of the first node
-  currDir = data.url;
-  $('#curr-dir').html(currDir);
-}
 
 //fixes the height 
 function maxHeight(div){

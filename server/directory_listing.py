@@ -1,52 +1,31 @@
-# -*- coding: utf-8 -*-
-'''
+"""
+@editor: Liran Funaro <funaro@cs.technion.ac.il>
 @author: Alex Nulman <anulman@cs.haifa.ac.il>
-'''
+"""
+import os
 
-from os import listdir, walk, environ, sep
-from os.path import join as join_path, basename
-from json import dumps
-root_dir = environ['experiment_root_dir']
-root_name = basename(root_dir)
 
-def get_subtree(current_path = []):
-    '''
-    generates file/folder subtrees for the file walker
-    '''
-    json_string = []
-    if current_path == [] or current_path == '':
-        path_to_list = root_dir
-    else:
-        if sep == '/': #add initial / in unix based systems
-            current_path.insert(0, sep)
-        path_to_list = join_path(*current_path)
-    for _,dirs,files in walk(path_to_list):
-        for d in dirs:
-            item = {}
-            item['text'] = d
-            item['children'] = True if listdir(join_path(path_to_list,d)) else False
-            item['id'] = join_path(path_to_list, d)
-            item['icon'] = 'glyphicon glyphicon-folder-open'
-            item['type'] = 'default'
-            item['state'] = {'opened':False}
-            json_string.append(item)
-        for f in files:
-            try:
-                if str(f).endswith('.db'):
-                    continue
-            except UnicodeEncodeError as e:
-                print e
-                continue
-            item = {}
-            item['text'] = f
-            item['children'] = False
-            item['icon'] = 'glyphicon glyphicon-file'
-            item['id'] = join_path(path_to_list, f)
-            item['type'] = 'file'
-            json_string.append(item)
-        break #we only want one layer of listing
-    json_string = {'json':json_string, 'url':root_dir}
-    return dumps(json_string)
+def get_subtree(path):
+    """ Generates file/folder subtrees for the file walker """
+    _, dirs, files = next(os.walk(path))
+
+    for d in dirs:
+        yield {'text': d,
+               'children': True if os.listdir(os.path.join(path, d)) else False,
+               'id': os.path.join(path, d),
+               'icon': 'glyphicon glyphicon-folder-open',
+               'type': 'default',
+               'state': {'opened': False},
+               }
+
+    for f in (f for f in files if not f.endswith(".db")):
+        yield {
+            'text': f,
+            'children': False,
+            'icon': 'glyphicon glyphicon-file',
+            'id': os.path.join(path, f),
+            'type': 'file',
+        }
 
 if __name__ == '__main__':            
-    print get_subtree()
+    print list(get_subtree("."))

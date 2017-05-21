@@ -1,4 +1,5 @@
-// Author: Hadas Shahar <hshaha05@campus.haifa.ac.il>
+// @author: Hadas Shahar <hshaha05@campus.haifa.ac.il>
+
 //////////////////////generation helper functions//////////////////////////
 //generates an input
 function generateInput(inputType){
@@ -114,10 +115,10 @@ function generateButton(id,className,text){
 
   return newButton;
 }
+
 //generates a <p> element with the required text
 function generateParagraph(text){
   var newP = document.createElement('p');
   newP.innerHTML = text;
-
   return newP;
 }
